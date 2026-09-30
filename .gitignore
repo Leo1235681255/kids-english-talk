@@ -24,3 +24,5 @@ assets_extracted/
 *.sln
 *.sw?
 .vercel
+
+.vercel
