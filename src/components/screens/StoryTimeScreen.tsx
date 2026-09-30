@@ -1,135 +1,129 @@
-import React, { useState } from 'react';
-import { Volume2, Play, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
-import { LessonData, StoryPanel } from '../../types';
-import { speakText, playPopSound } from '../../utils/audio';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Play } from 'lucide-react';
+import { Line, Lesson, Speaker } from '../../types';
+import { Nav, ScreenFrame } from '../HeaderNavbar';
+import { speakText, stopSpeaking } from '../../utils/audio';
 
-interface StoryTimeScreenProps {
-  lesson: LessonData;
-  onNext: () => void;
-}
+const AVATAR: Record<Speaker, string> = {
+  Mi: '/art/girl.png',
+  Bin: '/art/boy.png',
+  Pip: '/art/pip_sit.png',
+};
 
-export const StoryTimeScreen: React.FC<StoryTimeScreenProps> = ({
-  lesson,
-  onNext
-}) => {
-  const story = lesson.storyTime;
-  const [activePanel, setActivePanel] = useState<number | null>(null);
+const PANEL_BG = [
+  'linear-gradient(180deg,#9ddcff 0%,#d3f1c8 60%,#f3d9a4 100%)',
+  'linear-gradient(180deg,#ffd9a8 0%,#ffe9b5 55%,#cfeec0 100%)',
+  'linear-gradient(180deg,#bfe6ff 0%,#e3f6cf 60%,#ffe2a8 100%)',
+];
 
-  const handleReadPanel = (panel: StoryPanel) => {
-    playPopSound();
-    setActivePanel(panel.panelNumber);
-    speakText(panel.textEn, {
-      speaker: panel.speaker.includes('Mi') ? 'Mi' : 'Bin',
-      rate: 0.9,
-      onEnd: () => setActivePanel(null)
-    });
-  };
+/** A lesson with its own story uses it; otherwise the Talk Time dialogue is retold as a comic. */
+const pagesOf = (lesson: Lesson): Line[] => {
+  return lesson.story?.pages ?? lesson.talk.lines;
+};
 
-  const handlePlayAllStory = () => {
-    playPopSound();
-    let currentIdx = 0;
-    const playNext = () => {
-      if (currentIdx >= story.panels.length) {
-        setActivePanel(null);
-        return;
-      }
-      const panel = story.panels[currentIdx];
-      setActivePanel(panel.panelNumber);
-      speakText(panel.textEn, {
-        speaker: panel.speaker.includes('Mi') ? 'Mi' : 'Bin',
-        rate: 0.9,
-        onEnd: () => {
-          currentIdx++;
-          setTimeout(playNext, 700);
-        }
+export const StoryTimeScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, nav }) => {
+  const pages = useMemo(() => pagesOf(lesson), [lesson]);
+  const panels = useMemo(() => {
+    const out: Line[][] = [];
+    for (let i = 0; i < pages.length; i += 2) out.push(pages.slice(i, i + 2));
+    return out;
+  }, [pages]);
+  const [active, setActive] = useState(-1); // line index being read
+  const [read, setRead] = useState(false);
+  const token = useRef(0);
+
+  const readFrom = async (start: number, end: number) => {
+    const my = ++token.current;
+    stopSpeaking();
+    for (let i = start; i < end; i++) {
+      if (token.current !== my) return;
+      setActive(i);
+      await new Promise<void>((res) => {
+        let done = false;
+        const fin = () => {
+          if (!done) {
+            done = true;
+            window.setTimeout(res, 250);
+          }
+        };
+        speakText(pages[i].en, { speaker: pages[i].who, rate: 0.9, onEnd: fin });
+        window.setTimeout(fin, Math.max(1800, pages[i].en.length * 160));
       });
-    };
-    playNext();
+    }
+    if (token.current === my) {
+      setActive(-1);
+      if (end - start > 2) setRead(true);
+    }
   };
+
+  useEffect(
+    () => () => {
+      token.current++;
+      stopSpeaking();
+    },
+    []
+  );
+
+  const title = lesson.story?.title ?? lesson.title;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-4 flex flex-col gap-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-800">
-            Truyện Tranh (Story Time)
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 font-semibold">
-            {story.title}
-          </p>
+    <ScreenFrame screen="storytime" {...nav} nextReady={read}>
+      <div className="px-3 pt-2 pb-2">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <div className="rounded-full bg-white/85 px-3.5 py-1 text-base font-black text-purple-700 shadow">📖 {title}</div>
+          <button
+            onClick={() => readFrom(0, pages.length)}
+            className="pill-btn flex items-center gap-1.5 px-3.5 py-1.5 text-sm"
+          >
+            <Play className="w-4 h-4" fill="currentColor" /> Nghe cả truyện
+          </button>
         </div>
 
-        <button
-          onClick={handlePlayAllStory}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs sm:text-sm shadow-sm active:scale-95 transition-all"
-        >
-          <Play className="w-4 h-4 fill-current" />
-          <span>Kể toàn bộ truyện</span>
-        </button>
-      </div>
-
-      {/* Comic Panels Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {story.panels.map((panel) => {
-          const isActive = activePanel === panel.panelNumber;
-
-          return (
+        <div className="space-y-3">
+          {panels.map((panel, pi) => (
             <div
-              key={panel.panelNumber}
-              onClick={() => handleReadPanel(panel)}
-              className={`bg-white rounded-3xl p-4 sm:p-5 border-4 transition-all cursor-pointer shadow-md flex flex-col justify-between gap-3 ${
-                isActive
-                  ? 'border-indigo-500 scale-[1.02] ring-4 ring-indigo-200'
-                  : 'border-slate-200 hover:border-indigo-300'
-              }`}
+              key={pi}
+              onClick={() => readFrom(pi * 2, pi * 2 + panel.length)}
+              className="relative h-44 overflow-hidden rounded-2xl border-[3px] border-white shadow-[0_6px_14px_rgba(40,60,100,0.2)] cursor-pointer"
+              style={{ background: PANEL_BG[pi % PANEL_BG.length] }}
             >
-              {/* Top tag & audio icon */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
-                  Khung {panel.panelNumber}: {panel.speaker}
-                </span>
-                <div className={`p-1.5 rounded-full ${isActive ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
-                  <Volume2 className="w-4 h-4" />
-                </div>
-              </div>
-
-              {/* Panel visual */}
-              <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-sky-50 p-2 flex items-center justify-center border border-slate-100 shadow-inner">
-                <img
-                  src={panel.image}
-                  alt={panel.speaker}
-                  className="w-full h-full object-cover rounded-xl"
-                />
-              </div>
-
-              {/* Text Speech Bubble */}
-              <div className="p-3 rounded-2xl bg-indigo-50/70 border border-indigo-100">
-                <p className="text-base sm:text-lg font-black text-slate-800 leading-snug">
-                  "{panel.textEn}"
-                </p>
-                <p className="text-xs font-bold text-slate-500 mt-1">
-                  {panel.textVi}
-                </p>
-              </div>
+              {panel.map((line, k) => {
+                const idx = pi * 2 + k;
+                const left = k === 0;
+                return (
+                  <React.Fragment key={k}>
+                    <img
+                      src={AVATAR[line.who]}
+                      alt={line.who}
+                      draggable={false}
+                      className={`absolute bottom-0 h-[58%] ${left ? 'left-[6%]' : 'right-[6%]'} ${active === idx ? 'a-bob' : ''}`}
+                    />
+                    <div className={`absolute top-2 ${left ? 'left-2' : 'right-2'} max-w-[62%]`}>
+                      <div
+                        className={`bubble tail-none !rounded-2xl px-3 py-1.5 text-center leading-tight ${
+                          active === idx ? '!border-orange-400 ring-2 ring-orange-300' : ''
+                        }`}
+                      >
+                        <div className="text-[0.98rem]">{line.en}</div>
+                        <div className="text-[10px] font-semibold text-slate-400">{line.vi}</div>
+                      </div>
+                    </div>
+                  </React.Fragment>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
 
-      {/* Next Step */}
-      <div className="flex justify-end pt-2">
-        <button
-          onClick={() => {
-            playPopSound();
-            onNext();
-          }}
-          className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-black text-base shadow-md flex items-center justify-center gap-2 transition-all"
-        >
-          <span>Bài 9: Ôn Tập Nhanh (Review)</span>
-          <ArrowRight className="w-5 h-5" />
-        </button>
+        <div className="mt-3 flex items-end gap-2">
+          <img src="/art/pip_sit.png" alt="Pip" className="w-24 a-bob drop-shadow-lg" draggable={false} />
+          <div className="bubble tail-l mb-6 px-4 py-2.5 text-sm leading-snug">
+            Tap a picture
+            <br />
+            to hear the story!
+          </div>
+        </div>
       </div>
-    </div>
+    </ScreenFrame>
   );
 };

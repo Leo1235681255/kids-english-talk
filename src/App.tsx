@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { ScreenType, LessonData } from './types';
-import { LESSON_L1_U01_B1, LESSON_L1_U03_B1, LESSON_L1_U06_B1 } from './data/curriculum';
-import { HeaderNavbar, SCREEN_ORDER } from './components/HeaderNavbar';
+import React, { useCallback, useState } from 'react';
+import { ScreenType } from './types';
+import { getLesson, LESSONS, nextLesson } from './data/lessons';
+import { Nav, SCREEN_ORDER } from './components/HeaderNavbar';
 import { HomeScreen } from './components/screens/HomeScreen';
 import { WarmUpScreen } from './components/screens/WarmUpScreen';
 import { NewWordsScreen } from './components/screens/NewWordsScreen';
@@ -14,190 +14,85 @@ import { StoryTimeScreen } from './components/screens/StoryTimeScreen';
 import { ReviewScreen } from './components/screens/ReviewScreen';
 import { ParentsScreen } from './components/screens/ParentsScreen';
 import { StickerBookModal } from './components/StickerBookModal';
-import { playStarSound, playPopSound } from './utils/audio';
+import { useProgress } from './hooks/useProgress';
+import { stopSpeaking } from './utils/audio';
 
 export const App: React.FC = () => {
-  const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
-  const [activeLesson, setActiveLesson] = useState<LessonData>(LESSON_L1_U01_B1);
-  const [starsTotal, setStarsTotal] = useState<number>(() => {
-    const saved = localStorage.getItem('ket_stars_total');
-    return saved ? parseInt(saved, 10) : 12;
-  });
-  const [unlockedStickers, setUnlockedStickers] = useState<string[]>(() => {
-    const saved = localStorage.getItem('ket_stickers');
-    return saved ? JSON.parse(saved) : ['st_star', 'st_mi', 'st_pip', 'st_bin'];
-  });
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [isStickerBookOpen, setIsStickerBookOpen] = useState<boolean>(false);
+  const progress = useProgress();
+  const [screen, setScreen] = useState<ScreenType>('home');
+  const [lessonId, setLessonId] = useState<string>(LESSONS[0].id);
+  const [lessonStars, setLessonStars] = useState(0);
+  const [stickersOpen, setStickersOpen] = useState(false);
+  const lesson = getLesson(lessonId) ?? LESSONS[0];
 
-  useEffect(() => {
-    localStorage.setItem('ket_stars_total', starsTotal.toString());
-  }, [starsTotal]);
+  const go = useCallback((s: ScreenType) => {
+    stopSpeaking();
+    setScreen(s);
+  }, []);
 
-  useEffect(() => {
-    localStorage.setItem('ket_stickers', JSON.stringify(unlockedStickers));
-  }, [unlockedStickers]);
-
-  const handleEarnStar = () => {
-    setStarsTotal(prev => prev + 1);
+  const start = (id: string) => {
+    setLessonId(id);
+    setLessonStars(0);
+    go('warmup');
   };
 
-  const handleUnlockSticker = (stickerId: string) => {
-    if (!unlockedStickers.includes(stickerId)) {
-      setUnlockedStickers([...unlockedStickers, stickerId]);
-      playStarSound();
-    }
+  const idx = SCREEN_ORDER.indexOf(screen);
+  const nav: Nav = {
+    stars: progress.stars,
+    onHome: () => go('home'),
+    onBack: () => go(idx > 0 ? SCREEN_ORDER[idx - 1] : 'home'),
+    onNext: () => go(idx >= 0 && idx < SCREEN_ORDER.length - 1 ? SCREEN_ORDER[idx + 1] : 'home'),
+    earn: (n) => {
+      progress.addStars(n);
+      setLessonStars((s) => s + n);
+    },
   };
 
-  const handleStartLesson = (lesson: LessonData) => {
-    playPopSound();
-    setActiveLesson(lesson);
-    setCurrentScreen('warmup');
-  };
-
-  const handleNextStep = () => {
-    const currentIndex = SCREEN_ORDER.indexOf(currentScreen);
-    if (currentIndex >= 0 && currentIndex < SCREEN_ORDER.length - 1) {
-      setCurrentScreen(SCREEN_ORDER[currentIndex + 1]);
-    } else {
-      setCurrentScreen('home');
-    }
-  };
-
-  const handleNextLesson = () => {
-    playPopSound();
-    if (activeLesson.id === 'L1-U01-B1') {
-      setActiveLesson(LESSON_L1_U03_B1);
-      setCurrentScreen('warmup');
-    } else if (activeLesson.id === 'L1-U03-B1') {
-      setActiveLesson(LESSON_L1_U06_B1);
-      setCurrentScreen('warmup');
-    } else {
-      setActiveLesson(LESSON_L1_U01_B1);
-      setCurrentScreen('home');
-    }
-  };
+  const next = nextLesson(lesson.id);
 
   return (
-    <div className="min-h-screen bg-[#F0F7FD] flex flex-col justify-between text-slate-800">
-      {/* Header */}
-      <HeaderNavbar
-        currentScreen={currentScreen}
-        onNavigateScreen={setCurrentScreen}
-        onGoHome={() => setCurrentScreen('home')}
-        activeLesson={activeLesson}
-        starsTotal={starsTotal}
-        isMuted={isMuted}
-        onToggleMute={() => setIsMuted(!isMuted)}
-        onOpenStickerBook={() => setIsStickerBookOpen(true)}
-      />
+    <>
+      {screen === 'home' && (
+        <HomeScreen
+          stars={progress.stars}
+          collected={progress.stickers}
+          done={progress.done}
+          onStart={start}
+          onOpenStickers={() => setStickersOpen(true)}
+        />
+      )}
+      {/* key = lesson + screen so every screen starts from a clean state */}
+      {screen === 'warmup' && <WarmUpScreen key={lesson.id} lesson={lesson} nav={nav} />}
+      {screen === 'newwords' && <NewWordsScreen key={lesson.id} lesson={lesson} nav={nav} />}
+      {screen === 'listentap' && <ListenTapScreen key={lesson.id} lesson={lesson} nav={nav} />}
+      {screen === 'sayit' && <SayItScreen key={lesson.id} lesson={lesson} nav={nav} />}
+      {screen === 'talktime' && <TalkTimeScreen key={lesson.id} lesson={lesson} nav={nav} />}
+      {screen === 'play' && <PlayScreen key={lesson.id} lesson={lesson} nav={nav} />}
+      {screen === 'reward' && (
+        <RewardScreen
+          key={lesson.id}
+          lesson={lesson}
+          nav={nav}
+          lessonStars={lessonStars}
+          collected={progress.stickers}
+          onComplete={() => progress.completeLesson(lesson.id, lessonStars)}
+        />
+      )}
+      {screen === 'storytime' && <StoryTimeScreen key={lesson.id} lesson={lesson} nav={nav} />}
+      {screen === 'review' && <ReviewScreen key={lesson.id} lesson={lesson} nav={nav} />}
+      {screen === 'forparents' && (
+        <ParentsScreen
+          key={lesson.id}
+          lesson={lesson}
+          nav={nav}
+          lessonStars={lessonStars}
+          next={next}
+          onNextLesson={() => next && start(next.id)}
+        />
+      )}
 
-      {/* Main Content Area */}
-      <main className="flex-1 pb-10">
-        {currentScreen === 'home' && (
-          <HomeScreen
-            onStartLesson={handleStartLesson}
-            starsTotal={starsTotal}
-            unlockedStickersCount={unlockedStickers.length}
-            onOpenStickerBook={() => setIsStickerBookOpen(true)}
-          />
-        )}
-
-        {currentScreen === 'warmup' && (
-          <WarmUpScreen
-            lesson={activeLesson}
-            onNext={handleNextStep}
-          />
-        )}
-
-        {currentScreen === 'newwords' && (
-          <NewWordsScreen
-            lesson={activeLesson}
-            onNext={handleNextStep}
-          />
-        )}
-
-        {currentScreen === 'listentap' && (
-          <ListenTapScreen
-            lesson={activeLesson}
-            onNext={handleNextStep}
-            onEarnStar={handleEarnStar}
-          />
-        )}
-
-        {currentScreen === 'sayit' && (
-          <SayItScreen
-            lesson={activeLesson}
-            onNext={handleNextStep}
-            onEarnStar={handleEarnStar}
-          />
-        )}
-
-        {currentScreen === 'talktime' && (
-          <TalkTimeScreen
-            lesson={activeLesson}
-            onNext={handleNextStep}
-            onEarnStar={handleEarnStar}
-          />
-        )}
-
-        {currentScreen === 'play' && (
-          <PlayScreen
-            lesson={activeLesson}
-            onNext={handleNextStep}
-            onEarnStar={handleEarnStar}
-          />
-        )}
-
-        {currentScreen === 'reward' && (
-          <RewardScreen
-            lesson={activeLesson}
-            onNext={handleNextStep}
-            onUnlockSticker={handleUnlockSticker}
-            onOpenStickerBook={() => setIsStickerBookOpen(true)}
-          />
-        )}
-
-        {currentScreen === 'storytime' && (
-          <StoryTimeScreen
-            lesson={activeLesson}
-            onNext={handleNextStep}
-          />
-        )}
-
-        {currentScreen === 'review' && (
-          <ReviewScreen
-            lesson={activeLesson}
-            onNext={handleNextStep}
-            onEarnStar={handleEarnStar}
-          />
-        )}
-
-        {currentScreen === 'forparents' && (
-          <ParentsScreen
-            lesson={activeLesson}
-            starsTotal={starsTotal}
-            onGoHome={() => setCurrentScreen('home')}
-            onNextLesson={handleNextLesson}
-          />
-        )}
-      </main>
-
-      {/* Footer Branding */}
-      <footer className="py-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white/70">
-        <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Kids English Talk © 2026 — Chương trình tiếng Anh giao tiếp chuẩn Cambridge</span>
-          <span className="font-semibold text-blue-600">Đồng hành cùng Mi, Bin và Pip</span>
-        </div>
-      </footer>
-
-      {/* Sticker Album Modal */}
-      <StickerBookModal
-        isOpen={isStickerBookOpen}
-        onClose={() => setIsStickerBookOpen(false)}
-        unlockedStickerIds={unlockedStickers}
-      />
-    </div>
+      <StickerBookModal open={stickersOpen} onClose={() => setStickersOpen(false)} collected={progress.stickers} />
+    </>
   );
 };
 

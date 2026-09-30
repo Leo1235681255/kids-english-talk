@@ -1,124 +1,86 @@
-export type ScreenType = 
+export type ScreenType =
   | 'home'
-  | 'warmup'      // 1/10
-  | 'newwords'    // 2/10
-  | 'listentap'   // 3/10
-  | 'sayit'       // 4/10
-  | 'talktime'    // 5/10
-  | 'play'        // 6/10
-  | 'reward'      // 7/10
-  | 'storytime'   // 8/10
-  | 'review'      // 9/10
-  | 'forparents'; // 10/10
+  | 'warmup'
+  | 'newwords'
+  | 'listentap'
+  | 'sayit'
+  | 'talktime'
+  | 'play'
+  | 'reward'
+  | 'storytime'
+  | 'review'
+  | 'forparents';
 
-export interface WordItem {
+export type Speaker = 'Mi' | 'Bin' | 'Pip';
+
+/** A vocabulary item. `art` is a transparent PNG in /art, otherwise `emoji` is drawn big on a tinted tile. */
+export interface Word {
   id: string;
   en: string;
   vi: string;
-  image: string;
-  phonetic?: string;
-  sentenceEn?: string;
-  sentenceVi?: string;
+  art?: string;
+  emoji?: string;
+  /** soft tile tint used behind emoji art */
+  tint?: string;
 }
 
-export interface DialogueLine {
-  id: string;
-  speaker: 'Mi' | 'Bin' | 'Pip' | 'Teacher';
+export interface Line {
+  who: Speaker;
   en: string;
   vi: string;
-  avatar: string;
-  roleplayTarget?: boolean;
 }
 
-export interface MatchingPair {
+export interface Phrase {
+  en: string;
+  vi: string;
+}
+
+export type GameKind = 'match' | 'tapfind' | 'balloon';
+
+export interface Sticker {
   id: string;
-  word: string;
-  image: string;
+  name: string;
+  art?: string;
+  emoji?: string;
 }
 
-export interface StoryPanel {
-  panelNumber: number;
-  speaker: string;
-  textEn: string;
-  textVi: string;
-  image: string;
-  description: string;
-}
-
-export interface LessonData {
-  id: string; // e.g. "L1-U01-B1"
-  levelId: string; // "starter" | "explorer" | "adventurer"
-  unitId: string; // "L1-U01"
+export interface Lesson {
+  id: string; // L1-U01-B1
+  unitCode: string; // L1-U01
+  level: 1 | 2 | 3;
+  no: 1 | 2 | 3 | 4;
   title: string;
   titleVi: string;
-  subtitle: string;
-  targetWords: WordItem[];
-  warmup: {
-    title: string;
-    lyrics: string[];
-    lyricsVi: string[];
-    rhythm: string;
-    backgroundPrompt?: string;
-  };
-  listenTap: {
-    questions: {
-      targetWord: WordItem;
-      options: WordItem[];
-    }[];
-  };
-  sayIt: {
-    items: {
-      word: WordItem;
-      targetSentence?: string;
-      pipPraise: string;
-    }[];
-  };
-  talkTime: {
-    scene: string;
-    dialogue: DialogueLine[];
-    roleplayAs: 'Mi' | 'Bin';
-  };
-  playGame: {
-    type: 'match_line' | 'tap_find';
-    instruction: string;
-    pairs: MatchingPair[];
-  };
-  reward: {
-    stickerId: string;
-    stickerName: string;
-    stickerImage: string;
-    celebrationText: string;
-  };
-  storyTime: {
-    title: string;
-    panels: StoryPanel[];
-  };
-  parentSummary: {
-    todayWords: string[];
-    communicationPatterns: string[];
-    pedagogicalAdvice: string[];
-    completionBadge: string;
-  };
+  goal: string;
+  /** ids into the word dictionary */
+  words: string[];
+  /** extra ids used only as wrong answers */
+  extras?: string[];
+  chant: { title: string; rhythm: string; lines: Phrase[] };
+  /** short sentences the child repeats in "Say It" */
+  sentences: Phrase[];
+  talk: { scene: string; lines: Line[]; roleplay: 'Mi' | 'Bin' };
+  game: { kind: GameKind; prompt: string; ids: string[] };
+  story?: { title: string; pages: Line[] };
+  sticker: Sticker;
+  parent: { learned: string; patterns: string[]; tips: string[] };
 }
 
-export interface UnitData {
-  id: string;
-  code: string;
+export interface Unit {
+  code: string; // L1-U01
+  level: 1 | 2 | 3;
   title: string;
   titleVi: string;
   pattern: string;
-  wordsOverview: string[];
-  color: string;
-  icon: string;
-  lessons: LessonData[];
+  vocab: string;
+  emoji: string;
+  color: string; // tailwind gradient classes
 }
 
-export interface LevelData {
-  id: 'starter' | 'explorer' | 'adventurer';
-  title: string;
-  nameVi: string;
+export interface LevelInfo {
+  level: 1 | 2 | 3;
+  name: string;
   age: string;
-  cambridgeLevel: string;
-  description: string;
-  units: UnitData[];
+  cefr: string;
+  blurb: string;
 }

@@ -1,187 +1,117 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Pause, RotateCcw, ArrowRight, Volume2, Sparkles } from 'lucide-react';
-import { LessonData } from '../../types';
-import { speakText, stopSpeaking, playPopSound } from '../../utils/audio';
+import React, { useEffect, useRef, useState } from 'react';
+import { Languages, Pause, Play } from 'lucide-react';
+import { Lesson } from '../../types';
+import { Nav, ScreenFrame } from '../HeaderNavbar';
+import { speakText, stopSpeaking } from '../../utils/audio';
 
-interface WarmUpScreenProps {
-  lesson: LessonData;
-  onNext: () => void;
-}
+const NOTES = [
+  { c: 'text-sky-500', x: 6, y: 22, d: 0 },
+  { c: 'text-pink-400', x: 84, y: 34, d: 0.6 },
+  { c: 'text-yellow-400', x: 10, y: 50, d: 1.1 },
+  { c: 'text-emerald-500', x: 90, y: 14, d: 1.6 },
+];
 
-export const WarmUpScreen: React.FC<WarmUpScreenProps> = ({ lesson, onNext }) => {
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [currentLineIndex, setCurrentLineIndex] = useState<number>(-1);
+export const WarmUpScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, nav }) => {
+  const { lines, title, rhythm } = lesson.chant;
+  const [active, setActive] = useState(-1);
+  const [playing, setPlaying] = useState(false);
+  const [showVi, setShowVi] = useState(false);
+  const [played, setPlayed] = useState(false);
+  const token = useRef(0);
 
-  const lyrics = lesson.warmup.lyrics;
-  const lyricsVi = lesson.warmup.lyricsVi;
-
-  useEffect(() => {
-    return () => {
-      stopSpeaking();
-    };
-  }, []);
-
-  const playLine = (index: number) => {
-    if (index >= lyrics.length) {
-      setIsPlaying(false);
-      setCurrentLineIndex(-1);
-      return;
-    }
-
-    setCurrentLineIndex(index);
-    speakText(lyrics[index], {
-      speaker: index % 2 === 0 ? 'Pip' : 'Mi',
-      rate: 0.95,
-      pitch: index % 2 === 0 ? 1.4 : 1.25,
-      onEnd: () => {
-        // short delay between lines for rhythmic chant
-        setTimeout(() => {
-          playLine(index + 1);
-        }, 450);
-      }
-    });
-  };
-
-  const handleTogglePlay = () => {
-    playPopSound();
-    if (isPlaying) {
-      stopSpeaking();
-      setIsPlaying(false);
-      setCurrentLineIndex(-1);
-    } else {
-      setIsPlaying(true);
-      playLine(0);
-    }
-  };
-
-  const handleReplay = () => {
-    playPopSound();
+  const stop = () => {
+    token.current++;
     stopSpeaking();
-    setIsPlaying(true);
-    playLine(0);
+    setPlaying(false);
+    setActive(-1);
   };
+
+  const play = () => {
+    const my = ++token.current;
+    setPlaying(true);
+    const step = (i: number) => {
+      if (token.current !== my) return;
+      if (i >= lines.length) {
+        setPlaying(false);
+        setActive(-1);
+        setPlayed(true);
+        return;
+      }
+      setActive(i);
+      speakText(lines[i].en, { speaker: 'Mi', rate: 0.85, onEnd: () => window.setTimeout(() => step(i + 1), 220) });
+    };
+    step(0);
+  };
+
+  useEffect(() => stop, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-4 flex flex-col gap-5">
-      {/* Top Banner / Scene */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-sky-300 via-sky-100 to-amber-50 border-4 border-amber-300 shadow-md p-4 sm:p-6 text-center">
-        {/* Floating notes */}
-        <div className="absolute top-2 left-4 text-pink-500 text-2xl animate-bounce-soft">🎵</div>
-        <div className="absolute top-6 right-8 text-amber-500 text-3xl animate-bounce-soft" style={{ animationDelay: '0.4s' }}>🎶</div>
-        <div className="absolute bottom-4 left-8 text-blue-500 text-2xl animate-bounce-soft" style={{ animationDelay: '0.8s' }}>🎼</div>
-        <div className="absolute top-1/2 right-4 text-purple-500 text-2xl animate-bounce-soft" style={{ animationDelay: '1.2s' }}>🎵</div>
+    <ScreenFrame screen="warmup" {...nav} nextReady={played}>
+      <div className="relative min-h-full">
+        {NOTES.map((n, i) => (
+          <span
+            key={i}
+            className={`absolute text-3xl a-bob ${n.c}`}
+            style={{ left: `${n.x}%`, top: `${n.y}%`, animationDelay: `${n.d}s` }}
+          >
+            ♪
+          </span>
+        ))}
 
-        {/* School & Characters visual */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-3">
-          <div className="w-28 sm:w-36 rounded-2xl overflow-hidden shadow-md border-3 border-white bg-white/90">
-            <img
-              src="/assets/home_characters.png"
-              alt="School gate"
-              className="w-full h-auto object-cover"
-            />
+        {/* chant cloud */}
+        <div className="relative mx-4 mt-3 rounded-[2.2rem] bg-white/95 px-5 py-4 text-center shadow-[0_10px_28px_rgba(30,70,140,0.22)] border-[3px] border-white">
+          <div className="text-[11px] font-black uppercase tracking-wide text-orange-500">{title}</div>
+          <div className="mt-1 space-y-0.5">
+            {lines.map((l, i) => (
+              <div key={i} className={`transition-all ${active === i ? 'scale-105' : ''}`}>
+                <div
+                  className={`text-[1.3rem] leading-tight font-black ${
+                    active === i ? 'text-orange-500' : 'text-[#0f3a8a]'
+                  }`}
+                >
+                  {l.en}
+                </div>
+                {showVi && <div className="text-xs font-semibold text-slate-500">{l.vi}</div>}
+              </div>
+            ))}
           </div>
-          <div className="text-center sm:text-left">
-            <span className="inline-block px-3 py-1 rounded-full bg-amber-400 text-amber-950 font-black text-xs sm:text-sm uppercase tracking-wider mb-1">
-              Bài Chant Khởi Động
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-800">
-              {lesson.warmup.title}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 font-semibold">
-              Giai điệu: {lesson.warmup.rhythm}
-            </p>
-          </div>
-        </div>
+          <div className="mt-2 text-[11px] font-semibold text-slate-400">🎵 {rhythm}</div>
 
-        {/* Pip Singer Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-amber-200 shadow-sm text-xs font-bold text-amber-900">
-          <img src="/assets/sticker_pip.png" alt="Pip" className="w-6 h-6 object-cover rounded-full" />
-          <span>Bé cùng Pip và các bạn nhún nhảy và hát theo nhịp nhé!</span>
-        </div>
-      </div>
-
-      {/* Lyrics Box with Interactive Karaoke Highlight */}
-      <div className="rounded-3xl bg-white p-5 sm:p-7 border-3 border-amber-200 shadow-md">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-amber-100">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-500" />
-            <span className="font-extrabold text-slate-700 text-sm sm:text-base">
-              Lời bài hát / Lời chant
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
+          <div className="mt-3 flex items-center justify-center gap-2">
             <button
-              onClick={handleTogglePlay}
-              className={`px-4 py-2 rounded-2xl font-black text-sm flex items-center gap-2 shadow-sm transition-all active:scale-95 ${
-                isPlaying
-                  ? 'bg-rose-500 hover:bg-rose-600 text-white'
-                  : 'bg-amber-400 hover:bg-amber-500 text-amber-950'
+              onClick={playing ? stop : play}
+              className="pill-btn flex items-center gap-2 px-5 py-2 text-base"
+            >
+              {playing ? <Pause className="w-5 h-5" fill="currentColor" /> : <Play className="w-5 h-5" fill="currentColor" />}
+              {playing ? 'Dừng' : 'Hát cùng Pip'}
+            </button>
+            <button
+              onClick={() => setShowVi((v) => !v)}
+              aria-label="Hiện / ẩn tiếng Việt"
+              className={`grid place-items-center w-10 h-10 rounded-full border-2 ${
+                showVi ? 'bg-sky-500 border-sky-500 text-white' : 'bg-white border-sky-200 text-sky-500'
               }`}
             >
-              {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
-              <span>{isPlaying ? 'Tạm dừng' : 'Bật nhạc hát'}</span>
-            </button>
-
-            <button
-              onClick={handleReplay}
-              className="p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 active:scale-95 transition-all"
-              title="Phát lại từ đầu"
-            >
-              <RotateCcw className="w-4 h-4" />
+              <Languages className="w-5 h-5" />
             </button>
           </div>
+          {/* bubble tail */}
+          <span className="absolute -bottom-3 right-16 w-6 h-6 rotate-45 bg-white/95 border-r-[3px] border-b-[3px] border-white" />
         </div>
 
-        {/* Lines */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {lyrics.map((line, idx) => {
-            const isCurrent = currentLineIndex === idx;
-            return (
-              <div
-                key={idx}
-                onClick={() => {
-                  playPopSound();
-                  setCurrentLineIndex(idx);
-                  speakText(line, { speaker: idx % 2 === 0 ? 'Pip' : 'Mi' });
-                }}
-                className={`p-3.5 rounded-2xl cursor-pointer transition-all border-2 text-center sm:text-left flex items-center justify-between gap-3 ${
-                  isCurrent
-                    ? 'bg-amber-100 border-amber-400 scale-[1.02] shadow-md ring-2 ring-amber-300'
-                    : 'bg-amber-50/50 border-amber-100 hover:bg-amber-50 hover:border-amber-300'
-                }`}
-              >
-                <div>
-                  <div className={`text-base sm:text-lg font-black ${isCurrent ? 'text-amber-950' : 'text-slate-800'}`}>
-                    {line}
-                  </div>
-                  <div className="text-xs font-semibold text-slate-500 mt-0.5">
-                    {lyricsVi[idx]}
-                  </div>
-                </div>
-                <div className={`p-2 rounded-full ${isCurrent ? 'bg-amber-400 text-white' : 'bg-white text-amber-600'}`}>
-                  <Volume2 className="w-4 h-4" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <img
+          src="/art/pip_fly.png"
+          alt="Pip"
+          className="absolute right-2 top-[58%] w-24 a-sway drop-shadow-lg"
+          draggable={false}
+        />
+        <img
+          src="/art/duo.png"
+          alt="Mi và Bin"
+          className={`absolute left-0 bottom-0 w-[86%] drop-shadow-xl ${playing ? 'a-bob' : ''}`}
+          draggable={false}
+        />
       </div>
-
-      {/* Bottom Action: Next Screen */}
-      <div className="flex justify-end pt-2">
-        <button
-          onClick={() => {
-            playPopSound();
-            stopSpeaking();
-            onNext();
-          }}
-          className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-black text-base shadow-md flex items-center justify-center gap-2 transition-all"
-        >
-          <span>Bài 2: Từ Mới (New Words)</span>
-          <ArrowRight className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
+    </ScreenFrame>
   );
 };
