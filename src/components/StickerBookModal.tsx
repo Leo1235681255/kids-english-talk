@@ -1,6 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { unitsOfLevel } from '../data/catalog';
+import { UNITS } from '../data/catalog';
 import { lessonFor } from '../data/lessons';
 import { LockedSticker, StickerImg } from './ui/Sticker';
 
@@ -12,7 +12,8 @@ interface Props {
 
 export const StickerBookModal: React.FC<Props> = ({ open, onClose, collected }) => {
   if (!open) return null;
-  const units = unitsOfLevel(1);
+  // Starter is always listed; later levels appear once they have lessons
+  const units = UNITS.filter((u) => u.level === 1 || lessonFor(u.code, 1));
   const total = units.length * 4;
 
   return (
@@ -25,7 +26,7 @@ export const StickerBookModal: React.FC<Props> = ({ open, onClose, collected }) 
           <div>
             <h2 className="text-2xl font-black text-[#0f3a8a]">📒 Sổ sticker</h2>
             <p className="text-xs font-bold text-slate-500">
-              Cấp Starter · đã sưu tầm {collected.length}/{total}
+              Đã sưu tầm {collected.length}/{total}
             </p>
           </div>
           <button onClick={onClose} aria-label="Đóng" className="grid place-items-center w-10 h-10 rounded-full bg-white shadow text-slate-500">
@@ -37,7 +38,7 @@ export const StickerBookModal: React.FC<Props> = ({ open, onClose, collected }) 
           {units.map((u) => (
             <div key={u.code} className="rounded-2xl bg-white/80 px-3 py-2.5 shadow-sm">
               <div className="mb-2 text-sm font-black text-[#0f3a8a]">
-                {u.emoji} {u.code.replace('L1-', '')} · {u.title}
+                {u.emoji} {u.code.slice(3)} · {u.title}
               </div>
               <div className="flex items-center justify-around">
                 {[1, 2, 3, 4].map((no) => {

@@ -8,8 +8,33 @@ export const WordArt: React.FC<{ word: Word; className?: string; emojiSize?: str
   className = '',
   emojiSize = 'text-7xl',
 }) => {
+  if (word.digit) {
+    const palette = ['#EF4444', '#3B82F6', '#EAB308', '#22C55E', '#EC4899', '#F97316', '#8B5CF6', '#06B6D4', '#EF4444', '#3B82F6'];
+    const n = Number(word.digit);
+    return (
+      <div
+        className={`grid place-items-center rounded-3xl ${className}`}
+        style={{ background: word.tint ?? '#FFF1CC' }}
+        aria-label={word.en}
+      >
+        <span
+          className={`${emojiSize} font-black leading-none`}
+          style={{ color: palette[(n - 1) % palette.length], textShadow: '0 3px 0 rgba(0,0,0,0.12)' }}
+        >
+          {word.digit}
+        </span>
+      </div>
+    );
+  }
   if (word.art) {
-    return <img src={word.art} alt={word.en} draggable={false} className={`object-contain drop-shadow-md ${className}`} />;
+    return (
+      <img
+        src={word.art}
+        alt={word.en}
+        draggable={false}
+        className={`object-contain drop-shadow-md ${word.framed ? 'rounded-2xl' : ''} ${className}`}
+      />
+    );
   }
   return (
     <div

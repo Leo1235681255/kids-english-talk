@@ -1,7 +1,8 @@
 import { Lesson } from '../types';
+import { UNIT_LESSONS } from './units';
 
-/** Sample lessons. Chants are original; vocabulary and patterns follow giao-trinh-kids-english-talk.md. */
-export const LESSONS: Lesson[] = [
+/** Unit 1 lives here; units 2–9 are in units.ts. Vocabulary and patterns follow giao-trinh-kids-english-talk.md. */
+const UNIT_1: Lesson[] = [
   // ───────────────────────── L1-U01 · Hello! ─────────────────────────
   {
     id: 'L1-U01-B1',
@@ -217,107 +218,9 @@ export const LESSONS: Lesson[] = [
       ],
     },
   },
-
-  // ───────────────────────── L1-U03 · Colors ─────────────────────────
-  {
-    id: 'L1-U03-B1',
-    unitCode: 'L1-U03',
-    level: 1,
-    no: 1,
-    title: 'Red, Blue, Yellow',
-    titleVi: 'Đỏ, xanh, vàng',
-    goal: "Bé nhận biết 4 màu và trả lời: What color is it? — It's red.",
-    words: ['red', 'blue', 'yellow', 'green'],
-    extras: ['car', 'ball', 'kite', 'teddy'],
-    chant: {
-      title: 'Color Chant',
-      rhythm: 'Nhún nhảy, mỗi dòng chỉ vào một món đồ cùng màu',
-      lines: [
-        { en: 'Red, red, red — I see red!', vi: 'Đỏ, đỏ, đỏ — tớ thấy màu đỏ!' },
-        { en: 'Blue, blue, blue — I see blue!', vi: 'Xanh, xanh, xanh — tớ thấy màu xanh!' },
-        { en: 'Yellow, yellow — up in the sky!', vi: 'Vàng, vàng ơi — trên bầu trời!' },
-        { en: 'Green, green — wave hi!', vi: 'Xanh lá ơi — vẫy tay chào!' },
-      ],
-    },
-    sentences: [
-      { en: 'What color is it?', vi: 'Nó màu gì?' },
-      { en: "It's red!", vi: 'Màu đỏ!' },
-      { en: "It's blue!", vi: 'Màu xanh dương!' },
-    ],
-    talk: {
-      scene: 'Lớp học vẽ — Mi và Bin cầm cọ',
-      roleplay: 'Mi',
-      lines: [
-        { who: 'Bin', en: 'Look, Mi! What color is it?', vi: 'Nhìn này Mi! Nó màu gì?' },
-        { who: 'Mi', en: "It's red!", vi: 'Màu đỏ!' },
-        { who: 'Bin', en: 'And this?', vi: 'Còn cái này?' },
-        { who: 'Mi', en: "It's blue!", vi: 'Màu xanh dương!' },
-        { who: 'Pip', en: 'Great job, Mi!', vi: 'Giỏi lắm Mi!' },
-      ],
-    },
-    game: { kind: 'balloon', prompt: 'Color the balloon!', ids: ['red', 'blue', 'yellow', 'green'] },
-    sticker: { id: 'L1-U03-B1', name: 'Bảng màu vui', emoji: '🎨' },
-    parent: {
-      learned: 'red, blue, yellow, green',
-      patterns: ['What color is it?', "It's red."],
-      tips: [
-        'Bé đã nhận biết 4 màu và biết hỏi – đáp về màu sắc.',
-        'Chỉ vào đồ vật quanh nhà và hỏi "What color is it?".',
-        'Cho bé tô màu và nói tên màu vừa dùng.',
-      ],
-    },
-  },
-
-  // ───────────────────────── L1-U06 · Animals ─────────────────────────
-  {
-    id: 'L1-U06-B1',
-    unitCode: 'L1-U06',
-    level: 1,
-    no: 1,
-    title: 'Cute Animals',
-    titleVi: 'Những con vật đáng yêu',
-    goal: "Bé nhận biết cat, dog, bird, fish và nói: It's a cat.",
-    words: ['cat', 'dog', 'bird', 'fish'],
-    extras: ['girl', 'boy', 'car', 'ball'],
-    chant: {
-      title: 'Animal Chant',
-      rhythm: 'Vỗ tay đều, mỗi dòng bé chỉ vào một con vật',
-      lines: [
-        { en: 'Cat, cat — look, look, look!', vi: 'Mèo ơi — nhìn này!' },
-        { en: 'Dog, dog — look, look, look!', vi: 'Chó ơi — nhìn này!' },
-        { en: 'Bird, bird — look, look, look!', vi: 'Chim ơi — nhìn này!' },
-        { en: 'Fish, fish — hello, hello!', vi: 'Cá ơi — xin chào!' },
-      ],
-    },
-    sentences: [
-      { en: "What's this?", vi: 'Đây là gì?' },
-      { en: "It's a cat.", vi: 'Đó là con mèo.' },
-      { en: "It's a dog.", vi: 'Đó là con chó.' },
-    ],
-    talk: {
-      scene: 'Sân nhà bà ở quê — Bin và Mi gặp các con vật',
-      roleplay: 'Mi',
-      lines: [
-        { who: 'Bin', en: "Look, Mi! What's this?", vi: 'Nhìn này Mi! Đây là gì?' },
-        { who: 'Mi', en: "It's a dog!", vi: 'Là con chó!' },
-        { who: 'Bin', en: 'And this?', vi: 'Còn đây?' },
-        { who: 'Mi', en: "It's a cat!", vi: 'Là con mèo!' },
-        { who: 'Pip', en: 'Great job, Mi!', vi: 'Giỏi lắm Mi!' },
-      ],
-    },
-    game: { kind: 'match', prompt: 'Drag and match!', ids: ['cat', 'dog', 'bird', 'fish'] },
-    sticker: { id: 'L1-U06-B1', name: 'Dấu chân vui', emoji: '🐾' },
-    parent: {
-      learned: 'cat, dog, bird, fish',
-      patterns: ["What's this?", "It's a cat."],
-      tips: [
-        'Bé đã biết gọi tên 4 con vật và trả lời câu hỏi "What\'s this?".',
-        'Cùng bé xem ảnh con vật và hỏi "What\'s this?".',
-        'Bắt chước tiếng con vật để bé vui và nhớ lâu.',
-      ],
-    },
-  },
 ];
+
+export const LESSONS: Lesson[] = [...UNIT_1, ...UNIT_LESSONS];
 
 export const getLesson = (id: string) => LESSONS.find((l) => l.id === id);
 export const lessonsOfUnit = (code: string) => LESSONS.filter((l) => l.unitCode === code);

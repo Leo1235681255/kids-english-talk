@@ -3,6 +3,7 @@ import { Check, Lock } from 'lucide-react';
 import { LEVELS, unitsOfLevel } from '../../data/catalog';
 import { LESSONS, lessonFor } from '../../data/lessons';
 import { playPopSound } from '../../utils/audio';
+import { InstallButton } from '../InstallButton';
 
 interface Props {
   stars: number;
@@ -36,6 +37,9 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
             className="block w-full"
             style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, #000 9%)', maskImage: 'linear-gradient(to bottom, transparent 0, #000 9%)' }}
           />
+          <div className="absolute left-3 top-3">
+            <InstallButton />
+          </div>
           <div className="absolute right-3 top-3 flex items-center gap-2">
             <div className="flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 text-sm font-black text-amber-600 shadow">
               ⭐ {stars}
@@ -71,7 +75,7 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
         <div className="relative -mt-6 rounded-t-[2.2rem] bg-[#fffaf0] px-4 pb-10 pt-5 shadow-[0_-10px_30px_rgba(30,70,140,0.18)]">
           <div className="flex items-end justify-between">
             <h2 className="text-2xl font-black text-[#0f3a8a]">Chọn bài học</h2>
-            <span className="text-xs font-bold text-slate-400">{LESSONS.length} bài mẫu đã mở</span>
+            <span className="text-xs font-bold text-slate-400">{LESSONS.length} bài đã mở</span>
           </div>
 
           <div className="mt-3 grid grid-cols-3 gap-2">

@@ -20,8 +20,12 @@ export interface Word {
   vi: string;
   art?: string;
   emoji?: string;
-  /** soft tile tint used behind emoji art */
+  /** soft tile tint used behind emoji / digit art */
   tint?: string;
+  /** big colored numeral instead of a picture (Numbers unit) */
+  digit?: string;
+  /** art is a pastel portrait tile: draw it with rounded corners */
+  framed?: boolean;
 }
 
 export interface Line {

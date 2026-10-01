@@ -18,7 +18,7 @@ const PRAISE: Record<number, string> = {
 export const SayItScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, nav }) => {
   const items = useMemo<Item[]>(
     () => [
-      ...lesson.words.map((id): Item => ({ kind: 'word', word: wordOf(id), say: wordOf(id).en })),
+      ...lesson.words.slice(0, 6).map((id): Item => ({ kind: 'word', word: wordOf(id), say: wordOf(id).en })),
       ...lesson.sentences.map((s): Item => ({ kind: 'sentence', en: s.en, vi: s.vi })),
     ],
     [lesson]
