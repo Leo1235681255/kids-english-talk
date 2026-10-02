@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Check, Lock } from 'lucide-react';
+import { Check, ExternalLink, Lock } from 'lucide-react';
 import { LEVELS, unitsOfLevel } from '../../data/catalog';
 import { LESSONS, lessonFor } from '../../data/lessons';
+import { PLAYLIST_URL, SONGS, songOf } from '../../data/music';
+import { Song } from '../../types';
 import { playPopSound } from '../../utils/audio';
+import { SongThumb } from '../ui/Song';
 import { InstallButton } from '../InstallButton';
 
 interface Props {
@@ -11,9 +14,10 @@ interface Props {
   done: Record<string, number>;
   onStart: (lessonId: string) => void;
   onOpenStickers: () => void;
+  onPlaySong: (song: Song) => void;
 }
 
-export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, onOpenStickers }) => {
+export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, onOpenStickers, onPlaySong }) => {
   const [level, setLevel] = useState<1 | 2 | 3>(1);
   const [toast, setToast] = useState('');
   const info = LEVELS[level - 1];
@@ -71,8 +75,38 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
           />
         </div>
 
-        {/* lesson picker */}
         <div className="relative -mt-6 rounded-t-[2.2rem] bg-[#fffaf0] px-4 pb-10 pt-5 shadow-[0_-10px_30px_rgba(30,70,140,0.18)]">
+          {/* songs: one karaoke video per unit, shown with its YouTube preview */}
+          <section className="mb-6">
+            <div className="flex items-end justify-between gap-2">
+              <h2 className="text-2xl font-black text-[#0f3a8a]">🎵 Bài hát từng unit</h2>
+              <a
+                href={PLAYLIST_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex shrink-0 items-center gap-1 text-xs font-black text-red-600"
+              >
+                Playlist <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </div>
+            <p className="text-xs font-semibold text-slate-500">Bấm vào hình để xem và hát theo cùng Mi, Bin và Pip</p>
+            <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 hide-scroll">
+              {SONGS.map((s) => (
+                <div key={s.unit} className="w-[15.5rem] shrink-0 snap-start">
+                  <SongThumb
+                    song={s}
+                    badge={`UNIT ${s.unit.slice(-2)}`}
+                    onClick={() => {
+                      playPopSound();
+                      onPlaySong(s);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* lesson picker */}
           <div className="flex items-end justify-between">
             <h2 className="text-2xl font-black text-[#0f3a8a]">Chọn bài học</h2>
             <span className="text-xs font-bold text-slate-400">{LESSONS.length} bài đã mở</span>
@@ -103,15 +137,39 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
           </p>
 
           <div className="mt-3 grid grid-cols-2 gap-3">
-            {unitsOfLevel(level).map((u) => (
+            {unitsOfLevel(level).map((u) => {
+              const song = songOf(u.code);
+              return (
               <div key={u.code} className="overflow-hidden rounded-2xl bg-white shadow-[0_4px_0_rgba(150,120,60,0.15),0_8px_16px_rgba(40,60,100,0.08)]">
-                <div className={`bg-gradient-to-br ${u.color} flex items-center gap-2 px-3 py-2`}>
-                  <span className="text-3xl drop-shadow">{u.emoji}</span>
-                  <div className="min-w-0">
-                    <div className="text-[10px] font-black text-white/80">{u.code.slice(3)}</div>
-                    <div className="truncate text-sm font-black leading-tight text-white">{u.title}</div>
+                {song ? (
+                  <div className="relative">
+                    <SongThumb
+                      song={song}
+                      caption={false}
+                      playSize="sm"
+                      className="!rounded-none !shadow-none"
+                      onClick={() => {
+                        playPopSound();
+                        onPlaySong(song);
+                      }}
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-gradient-to-t from-black/70 to-transparent px-2.5 pb-1.5 pt-6">
+                      <span className="text-xl drop-shadow">{u.emoji}</span>
+                      <div className="min-w-0">
+                        <div className="text-[9px] font-black text-white/80">UNIT {u.code.slice(-2)}</div>
+                        <div className="truncate text-[13px] font-black leading-tight text-white">{u.title}</div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className={`bg-gradient-to-br ${u.color} flex items-center gap-2 px-3 py-2`}>
+                    <span className="text-3xl drop-shadow">{u.emoji}</span>
+                    <div className="min-w-0">
+                      <div className="text-[10px] font-black text-white/80">UNIT {u.code.slice(-2)}</div>
+                      <div className="truncate text-sm font-black leading-tight text-white">{u.title}</div>
+                    </div>
+                  </div>
+                )}
                 <div className="px-3 pt-1.5 text-[11px] font-bold text-slate-500">{u.titleVi}</div>
                 <div className="flex gap-1.5 px-3 pb-3 pt-1.5">
                   {[1, 2, 3, 4].map((no) => {
@@ -146,8 +204,17 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
                   })}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
+
+          {unitsOfLevel(level).length === 0 && (
+            <div className="mt-3 rounded-2xl bg-white px-4 py-8 text-center shadow">
+              <div className="text-4xl">🚀</div>
+              <div className="mt-1 text-lg font-black text-[#0f3a8a]">{info.name} sắp ra mắt!</div>
+              <p className="text-sm font-semibold text-slate-500">Pip đang chuẩn bị bài học mới cho các bé lớn hơn.</p>
+            </div>
+          )}
 
           <p className="mt-5 text-center text-[11px] font-semibold text-slate-400">
             Kids English Talk · cùng Mi, Bin và Pip

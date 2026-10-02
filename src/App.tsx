@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { ScreenType } from './types';
+import { ScreenType, Song } from './types';
 import { getLesson, LESSONS, nextLesson } from './data/lessons';
 import { Nav, SCREEN_ORDER } from './components/HeaderNavbar';
 import { HomeScreen } from './components/screens/HomeScreen';
@@ -14,6 +14,7 @@ import { StoryTimeScreen } from './components/screens/StoryTimeScreen';
 import { ReviewScreen } from './components/screens/ReviewScreen';
 import { ParentsScreen } from './components/screens/ParentsScreen';
 import { StickerBookModal } from './components/StickerBookModal';
+import { MusicModal } from './components/MusicModal';
 import { useProgress } from './hooks/useProgress';
 import { stopSpeaking } from './utils/audio';
 
@@ -23,6 +24,7 @@ export const App: React.FC = () => {
   const [lessonId, setLessonId] = useState<string>(LESSONS[0].id);
   const [lessonStars, setLessonStars] = useState(0);
   const [stickersOpen, setStickersOpen] = useState(false);
+  const [song, setSong] = useState<Song | null>(null);
   const lesson = getLesson(lessonId) ?? LESSONS[0];
 
   const go = useCallback((s: ScreenType) => {
@@ -59,6 +61,7 @@ export const App: React.FC = () => {
           done={progress.done}
           onStart={start}
           onOpenStickers={() => setStickersOpen(true)}
+          onPlaySong={setSong}
         />
       )}
       {/* key = lesson + screen so every screen starts from a clean state */}
@@ -91,6 +94,7 @@ export const App: React.FC = () => {
         />
       )}
 
+      <MusicModal song={song} onClose={() => setSong(null)} onLearn={start} />
       <StickerBookModal open={stickersOpen} onClose={() => setStickersOpen(false)} collected={progress.stickers} />
     </>
   );

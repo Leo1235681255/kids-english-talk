@@ -73,12 +73,21 @@ export interface Lesson {
 export interface Unit {
   code: string; // L1-U01
   level: 1 | 2 | 3;
-  title: string;
+  title: string; // topic, e.g. "My Family"
+  /** the unit's own headline from the book, e.g. "I Love My Family!" */
+  headline: string;
   titleVi: string;
   pattern: string;
   vocab: string;
   emoji: string;
   color: string; // tailwind gradient classes
+}
+
+/** A unit's song video on YouTube (Kids English Talk playlist by Leo English). */
+export interface Song {
+  unit: string; // L1-U01
+  videoId: string;
+  title: string; // short, e.g. "Hello & Friends Song"
 }
 
 export interface LevelInfo {

@@ -12,8 +12,8 @@ interface Props {
 
 export const StickerBookModal: React.FC<Props> = ({ open, onClose, collected }) => {
   if (!open) return null;
-  // Starter is always listed; later levels appear once they have lessons
-  const units = UNITS.filter((u) => u.level === 1 || lessonFor(u.code, 1));
+  // only units that already have lessons
+  const units = UNITS.filter((u) => lessonFor(u.code, 1));
   const total = units.length * 4;
 
   return (

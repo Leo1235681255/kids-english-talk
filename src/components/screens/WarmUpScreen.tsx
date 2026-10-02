@@ -3,6 +3,8 @@ import { Languages, Pause, Play } from 'lucide-react';
 import { Lesson } from '../../types';
 import { Nav, ScreenFrame } from '../HeaderNavbar';
 import { speakText, stopSpeaking } from '../../utils/audio';
+import { songOf } from '../../data/music';
+import { SongEmbed, SongThumb } from '../ui/Song';
 
 const NOTES = [
   { c: 'text-sky-500', x: 6, y: 22, d: 0 },
@@ -17,6 +19,8 @@ export const WarmUpScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, n
   const [playing, setPlaying] = useState(false);
   const [showVi, setShowVi] = useState(false);
   const [played, setPlayed] = useState(false);
+  const [watching, setWatching] = useState(false);
+  const song = songOf(lesson.unitCode);
   const token = useRef(0);
 
   const stop = () => {
@@ -47,7 +51,7 @@ export const WarmUpScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, n
 
   return (
     <ScreenFrame screen="warmup" {...nav} nextReady={played}>
-      <div className="relative min-h-full">
+      <div className="relative flex min-h-full flex-col">
         {NOTES.map((n, i) => (
           <span
             key={i}
@@ -57,6 +61,29 @@ export const WarmUpScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, n
             ♪
           </span>
         ))}
+
+        {/* the unit's song video: preview picture first, plays in place when tapped */}
+        {song && (
+          <div className="relative mx-4 mt-3">
+            {watching ? (
+              <SongEmbed song={song} />
+            ) : (
+              <SongThumb
+                song={song}
+                badge={`UNIT ${song.unit.slice(-2)}`}
+                playSize="lg"
+                onClick={() => {
+                  stop();
+                  setWatching(true);
+                  setPlayed(true);
+                }}
+              />
+            )}
+            <div className="mt-1 text-center text-xs font-black text-white drop-shadow">
+              {watching ? 'Hát theo video nhé! 🎤' : '🎵 Bấm để xem bài hát của unit này'}
+            </div>
+          </div>
+        )}
 
         {/* chant cloud */}
         <div className="relative mx-4 mt-3 rounded-[2.2rem] bg-white/95 px-5 py-4 text-center shadow-[0_10px_28px_rgba(30,70,140,0.22)] border-[3px] border-white">
@@ -99,18 +126,21 @@ export const WarmUpScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, n
           <span className="absolute -bottom-3 right-16 w-6 h-6 rotate-45 bg-white/95 border-r-[3px] border-b-[3px] border-white" />
         </div>
 
-        <img
-          src="/art/pip_fly.png"
-          alt="Pip"
-          className="absolute right-2 top-[58%] w-24 a-sway drop-shadow-lg"
-          draggable={false}
-        />
-        <img
-          src="/art/duo.png"
-          alt="Mi và Bin"
-          className={`absolute left-0 bottom-0 w-[86%] drop-shadow-xl ${playing ? 'a-bob' : ''}`}
-          draggable={false}
-        />
+        {/* Mi, Bin and Pip sit at the bottom of the page and never cover the buttons above */}
+        <div className="relative mt-auto h-[15.5rem] shrink-0">
+          <img
+            src="/art/pip_fly.png"
+            alt="Pip"
+            className="absolute right-2 bottom-[48%] w-20 a-sway drop-shadow-lg"
+            draggable={false}
+          />
+          <img
+            src="/art/duo.png"
+            alt="Mi và Bin"
+            className={`absolute left-0 bottom-0 w-[74%] drop-shadow-xl ${playing ? 'a-bob' : ''}`}
+            draggable={false}
+          />
+        </div>
       </div>
     </ScreenFrame>
   );

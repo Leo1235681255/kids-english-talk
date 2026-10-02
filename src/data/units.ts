@@ -1317,8 +1317,8 @@ export const TOYS: Lesson[] = [
   }),
 ];
 
-/* ═════════════════════════ L2-U01 · My School ═════════════════════════ */
-const S01 = 'L2-U01';
+/* ═════════════════════════ L1-U09 · My School ═════════════════════════ */
+const S01 = 'L1-U09';
 export const SCHOOL: Lesson[] = [
   make(S01, 1, {
     title: 'Pencil, Pen, Book, Bag',
