@@ -1,5 +1,5 @@
 // Kids English Talk service worker: cho phép cài app và học lại khi mất mạng.
-const CACHE = 'kids-english-v1';
+const CACHE = 'kids-english-v2';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
