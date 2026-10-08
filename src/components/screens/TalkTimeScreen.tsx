@@ -4,14 +4,9 @@ import { Lesson, Speaker } from '../../types';
 import { Nav, ScreenFrame } from '../HeaderNavbar';
 import { useMic } from '../../hooks/useMic';
 import { playStarSound, speakText, stopSpeaking } from '../../utils/audio';
+import { SPEAKERS } from '../../data/speakers';
 
 type Mode = 'watch' | 'play';
-
-const NAME_COLOR: Record<Speaker, string> = {
-  Mi: 'bg-yellow-400 text-yellow-950',
-  Bin: 'bg-blue-500 text-white',
-  Pip: 'bg-orange-500 text-white',
-};
 
 /** Resolve after the line is spoken; the timeout covers browsers without speech synthesis. */
 const speakP = (text: string, who: Speaker) =>
@@ -23,7 +18,7 @@ const speakP = (text: string, who: Speaker) =>
         res();
       }
     };
-    speakText(text, { speaker: who, rate: 0.9, onEnd: () => window.setTimeout(finish, 350) });
+    speakText(text, { speaker: SPEAKERS[who].voice, rate: 0.9, onEnd: () => window.setTimeout(finish, 350) });
     window.setTimeout(finish, Math.max(2000, text.length * 160));
   });
 
@@ -114,7 +109,7 @@ export const TalkTimeScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson,
               return (
                 <div key={i} className={`flex ${side} a-pop`}>
                   <div className="max-w-[78%]">
-                    <span className={`mb-1 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-black ${NAME_COLOR[l.who]}`}>
+                    <span className={`mb-1 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-black ${SPEAKERS[l.who].chip}`}>
                       {l.who}
                     </span>
                     <div

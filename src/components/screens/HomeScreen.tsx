@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Check, ExternalLink, Lock } from 'lucide-react';
 import { LEVELS, unitsOfLevel } from '../../data/catalog';
 import { LESSONS, lessonFor } from '../../data/lessons';
-import { PLAYLIST_URL, SONGS, songOf } from '../../data/music';
+import { levelOfUnit, playlistUrl, SONGS, songOf } from '../../data/music';
 import { Song } from '../../types';
 import { playPopSound } from '../../utils/audio';
 import { SongThumb } from '../ui/Song';
@@ -21,6 +21,7 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
   const [level, setLevel] = useState<1 | 2 | 3>(1);
   const [toast, setToast] = useState('');
   const info = LEVELS[level - 1];
+  const levelSongs = SONGS.filter((s) => levelOfUnit(s.unit) === level);
   const continueId = (LESSONS.find((l) => !(l.id in done)) ?? LESSONS[0]).id;
 
   const soon = () => {
@@ -77,11 +78,12 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
 
         <div className="relative -mt-6 rounded-t-[2.2rem] bg-[#fffaf0] px-4 pb-10 pt-5 shadow-[0_-10px_30px_rgba(30,70,140,0.18)]">
           {/* songs: one karaoke video per unit, shown with its YouTube preview */}
+          {levelSongs.length > 0 && (
           <section className="mb-6">
             <div className="flex items-end justify-between gap-2">
               <h2 className="text-2xl font-black text-[#0f3a8a]">🎵 Bài hát từng unit</h2>
               <a
-                href={PLAYLIST_URL}
+                href={playlistUrl(level)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex shrink-0 items-center gap-1 text-xs font-black text-red-600"
@@ -91,7 +93,7 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
             </div>
             <p className="text-xs font-semibold text-slate-500">Bấm vào hình để xem và hát theo cùng Mi, Bin và Pip</p>
             <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 hide-scroll">
-              {SONGS.map((s) => (
+              {levelSongs.map((s) => (
                 <div key={s.unit} className="w-[15.5rem] shrink-0 snap-start">
                   <SongThumb
                     song={s}
@@ -105,6 +107,7 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
               ))}
             </div>
           </section>
+          )}
 
           {/* lesson picker */}
           <div className="flex items-end justify-between">

@@ -1,8 +1,9 @@
 import { Lesson } from '../types';
 import { UNIT_LESSONS } from './units';
 import { UNIT_LESSONS_B } from './units2';
+import { UNIT_LESSONS_L2 } from './units3';
 
-/** Unit 1 lives here; units 2–9 are in units.ts, units 10–16 in units2.ts. Vocabulary and patterns follow giao-trinh-kids-english-talk.md. */
+/** Unit 1 lives here; units 2–9 are in units.ts, units 10–16 in units2.ts, Level 2 in units3.ts. Vocabulary and patterns follow giao-trinh-kids-english-talk.md. */
 const UNIT_1: Lesson[] = [
   // ───────────────────────── L1-U01 · Hello! ─────────────────────────
   {
@@ -221,7 +222,7 @@ const UNIT_1: Lesson[] = [
   },
 ];
 
-export const LESSONS: Lesson[] = [...UNIT_1, ...UNIT_LESSONS, ...UNIT_LESSONS_B];
+export const LESSONS: Lesson[] = [...UNIT_1, ...UNIT_LESSONS, ...UNIT_LESSONS_B, ...UNIT_LESSONS_L2];
 
 export const getLesson = (id: string) => LESSONS.find((l) => l.id === id);
 export const lessonsOfUnit = (code: string) => LESSONS.filter((l) => l.unitCode === code);

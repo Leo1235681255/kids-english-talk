@@ -11,7 +11,7 @@ export type ScreenType =
   | 'review'
   | 'forparents';
 
-export type Speaker = 'Mi' | 'Bin' | 'Pip';
+export type Speaker = 'Mi' | 'Bin' | 'Pip' | 'Miss Hoa' | 'Lan' | 'Mom' | 'Grandma' | 'Ant' | 'Little Crab' | 'Dolphin' | 'Octopus';
 
 /** A vocabulary item. `art` is a transparent PNG in /art, otherwise `emoji` is drawn big on a tinted tile. */
 export interface Word {

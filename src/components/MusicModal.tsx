@@ -3,7 +3,7 @@ import { ExternalLink, ListMusic, X } from 'lucide-react';
 import { Song } from '../types';
 import { unitByCode } from '../data/catalog';
 import { lessonFor } from '../data/lessons';
-import { CHANNEL_NAME, PLAYLIST_URL, watchUrl } from '../data/music';
+import { CHANNEL_NAME, levelOfUnit, playlistUrl, watchUrl } from '../data/music';
 import { stopSpeaking } from '../utils/audio';
 import { SongEmbed } from './ui/Song';
 
@@ -70,7 +70,7 @@ export const MusicModal: React.FC<Props> = ({ song, onClose, onLearn }) => {
             <ExternalLink className="h-4 w-4" /> Mở YouTube
           </a>
           <a
-            href={PLAYLIST_URL}
+            href={playlistUrl(levelOfUnit(song.unit))}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-sm font-black text-sky-600 shadow active:scale-95"

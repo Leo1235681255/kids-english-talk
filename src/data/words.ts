@@ -1,4 +1,5 @@
 import { Word } from '../types';
+import { L2_WORDS } from './words2';
 
 const w = (id: string, vi: string, o: Partial<Word> = {}): Word => ({ id, en: o.en ?? id, vi, ...o });
 /** picture word: cut-out art from public/art */
@@ -150,6 +151,9 @@ export const WORDS: Record<string, Word> = {
   train: w('train', 'tàu hỏa', { emoji: '🚆', tint: '#DDEBFF' }),
   plane: w('plane', 'máy bay', { emoji: '✈️', tint: '#D5F3F7' }),
   boat: w('boat', 'tàu thủy', { emoji: '⛵', tint: '#E8DDFB' }),
+
+  // Level 2 · Explorer
+  ...L2_WORDS,
 };
 
 export const COLOR_HEX: Record<string, string> = {

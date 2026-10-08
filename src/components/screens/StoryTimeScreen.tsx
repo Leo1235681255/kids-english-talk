@@ -3,12 +3,7 @@ import { Play } from 'lucide-react';
 import { Line, Lesson, Speaker } from '../../types';
 import { Nav, ScreenFrame } from '../HeaderNavbar';
 import { speakText, stopSpeaking } from '../../utils/audio';
-
-const AVATAR: Record<Speaker, string> = {
-  Mi: '/art/girl.png',
-  Bin: '/art/boy.png',
-  Pip: '/art/pip_sit.png',
-};
+import { SPEAKERS } from '../../data/speakers';
 
 const PANEL_BG = [
   'linear-gradient(180deg,#9ddcff 0%,#d3f1c8 60%,#f3d9a4 100%)',
@@ -46,7 +41,7 @@ export const StoryTimeScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson
             window.setTimeout(res, 250);
           }
         };
-        speakText(pages[i].en, { speaker: pages[i].who, rate: 0.9, onEnd: fin });
+        speakText(pages[i].en, { speaker: SPEAKERS[pages[i].who].voice, rate: 0.9, onEnd: fin });
         window.setTimeout(fin, Math.max(1800, pages[i].en.length * 160));
       });
     }
@@ -84,23 +79,16 @@ export const StoryTimeScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson
             <div
               key={pi}
               onClick={() => readFrom(pi * 2, pi * 2 + panel.length)}
-              className="relative h-44 overflow-hidden rounded-2xl border-[3px] border-white shadow-[0_6px_14px_rgba(40,60,100,0.2)] cursor-pointer"
+              className="relative flex flex-col overflow-hidden rounded-2xl border-[3px] border-white shadow-[0_6px_14px_rgba(40,60,100,0.2)] cursor-pointer"
               style={{ background: PANEL_BG[pi % PANEL_BG.length] }}
             >
-              {panel.map((line, k) => {
-                const idx = pi * 2 + k;
-                const left = k === 0;
-                return (
-                  <React.Fragment key={k}>
-                    <img
-                      src={AVATAR[line.who]}
-                      alt={line.who}
-                      draggable={false}
-                      className={`absolute bottom-0 h-[58%] ${left ? 'left-[6%]' : 'right-[6%]'} ${active === idx ? 'a-bob' : ''}`}
-                    />
-                    <div className={`absolute top-2 ${left ? 'left-2' : 'right-2'} max-w-[62%]`}>
+              <div className="space-y-1.5 px-2 pt-2">
+                {panel.map((line, k) => {
+                  const idx = pi * 2 + k;
+                  return (
+                    <div key={k} className={`flex ${k === 0 ? 'justify-start' : 'justify-end'}`}>
                       <div
-                        className={`bubble tail-none !rounded-2xl px-3 py-1.5 text-center leading-tight ${
+                        className={`bubble tail-none !rounded-2xl max-w-[88%] px-3 py-1.5 text-center leading-tight ${
                           active === idx ? '!border-orange-400 ring-2 ring-orange-300' : ''
                         }`}
                       >
@@ -108,9 +96,22 @@ export const StoryTimeScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson
                         <div className="text-[10px] font-semibold text-slate-400">{line.vi}</div>
                       </div>
                     </div>
-                  </React.Fragment>
-                );
-              })}
+                  );
+                })}
+              </div>
+              <div className="flex h-24 items-end justify-between px-[6%] pt-1">
+                {panel.map((line, k) => (
+                  <img
+                    key={k}
+                    src={SPEAKERS[line.who].avatar}
+                    alt={line.who}
+                    draggable={false}
+                    className={`h-full w-auto max-w-[40%] object-contain object-bottom ${k === 1 ? 'ml-auto' : ''} ${
+                      active === pi * 2 + k ? 'a-bob' : ''
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           ))}
         </div>
