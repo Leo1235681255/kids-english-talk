@@ -1,12 +1,12 @@
 import { GameKind, Lesson, Line, Phrase, Speaker } from '../types';
 
 type Pair = [string, string];
-type Talk = [Speaker, string, string];
+export type Talk = [Speaker, string, string];
 
 const P = (a: Pair[]): Phrase[] => a.map(([en, vi]) => ({ en, vi }));
 const T = (a: Talk[]): Line[] => a.map(([who, en, vi]) => ({ who, en, vi }));
 
-interface Def {
+export interface Def {
   title: string;
   titleVi: string;
   goal: string;
@@ -21,7 +21,7 @@ interface Def {
   parent: { learned: string; patterns: string[]; tips: string[] };
 }
 
-const make = (unit: string, no: 1 | 2 | 3 | 4, d: Def): Lesson => ({
+export const make = (unit: string, no: 1 | 2 | 3 | 4, d: Def): Lesson => ({
   id: `${unit}-B${no}`,
   unitCode: unit,
   level: Number(unit[1]) as 1 | 2 | 3,
@@ -40,9 +40,9 @@ const make = (unit: string, no: 1 | 2 | 3 | 4, d: Def): Lesson => ({
   parent: d.parent,
 });
 
-const MATCH = 'Drag and match!';
-const FIND = 'Tap the picture I say!';
-const GREAT: Talk = ['Pip', 'Great job!', 'Giỏi lắm!'];
+export const MATCH = 'Drag and match!';
+export const FIND = 'Tap the picture I say!';
+export const GREAT: Talk = ['Pip', 'Great job!', 'Giỏi lắm!'];
 
 /* ═════════════════════════ L1-U02 · My Family ═════════════════════════ */
 const U02 = 'L1-U02';

@@ -95,6 +95,61 @@ export const WORDS: Record<string, Word> = {
   ruler: a('ruler', 'cây thước'),
   eraser: a('eraser', 'cục tẩy'),
   desk: w('desk', 'bàn học', { emoji: '🪑', tint: '#F3E3C8' }),
+
+  // Unit 10 · Feelings
+  happy: w('happy', 'vui vẻ', { emoji: '😊', tint: '#FFF3BF' }),
+  sad: w('sad', 'buồn', { emoji: '😢', tint: '#DDEBFF' }),
+  angry: w('angry', 'tức giận', { emoji: '😠', tint: '#FFE3E3' }),
+  tired: w('tired', 'mệt', { emoji: '😴', tint: '#E8DDFB' }),
+  hungry: w('hungry', 'đói', { emoji: '🍽️', tint: '#FFE6CC' }),
+  scared: w('scared', 'sợ hãi', { emoji: '😨', tint: '#D5F3F7' }),
+  fine: w('fine', 'khỏe, ổn', { emoji: '🙂', tint: '#DDF6D8' }),
+
+  // Unit 11 · Clothes
+  tshirt: w('tshirt', 'áo thun', { en: 'T-shirt', emoji: '👕', tint: '#FFE3E3' }),
+  pants: w('pants', 'quần dài', { emoji: '👖', tint: '#DDEBFF' }),
+  dress: w('dress', 'váy đầm', { emoji: '👗', tint: '#FFE0F0' }),
+  jacket: w('jacket', 'áo khoác', { emoji: '🧥', tint: '#FFF3BF' }),
+  socks: w('socks', 'đôi tất', { emoji: '🧦', tint: '#E8DDFB' }),
+  shoes: w('shoes', 'đôi giày', { emoji: '👟', tint: '#D5F3F7' }),
+
+  // Unit 12 · My House
+  bedroom: w('bedroom', 'phòng ngủ', { emoji: '🛏️', tint: '#E8DDFB' }),
+  kitchen: w('kitchen', 'nhà bếp', { emoji: '🍳', tint: '#FFE6CC' }),
+  bathroom: w('bathroom', 'phòng tắm', { emoji: '🛁', tint: '#D5F3F7' }),
+  livingroom: w('livingroom', 'phòng khách', { en: 'living room', emoji: '🛋️', tint: '#FFE3E3' }),
+  in: w('in', 'ở trong', { emoji: '📦', tint: '#F3E3C8' }),
+  on: w('on', 'ở trên', { emoji: '🔝', tint: '#DDEBFF' }),
+  under: w('under', 'ở dưới', { emoji: '⬇️', tint: '#DDF6D8' }),
+
+  // Unit 13 · Weather
+  sunny: w('sunny', 'trời nắng', { emoji: '☀️', tint: '#FFF3BF' }),
+  cloudy: w('cloudy', 'nhiều mây', { emoji: '☁️', tint: '#E4E2F5' }),
+  rainy: w('rainy', 'trời mưa', { emoji: '🌧️', tint: '#DDEBFF' }),
+  snowy: w('snowy', 'có tuyết', { emoji: '❄️', tint: '#D5F3F7' }),
+  windy: w('windy', 'có gió', { emoji: '💨', tint: '#DDF6D8' }),
+  rainbow: w('rainbow', 'cầu vồng', { emoji: '🌈', tint: '#FFE0F0' }),
+
+  // Unit 14 · Fruits (apple, banana come from Unit 7; "orange" the colour is taken, so the fruit gets its own id)
+  orangefruit: w('orangefruit', 'quả cam', { en: 'orange', emoji: '🍊', tint: '#FFE6CC' }),
+  grapes: w('grapes', 'chùm nho', { emoji: '🍇', tint: '#E8DDFB' }),
+  watermelon: w('watermelon', 'dưa hấu', { emoji: '🍉', tint: '#DDF6D8' }),
+  strawberry: w('strawberry', 'dâu tây', { emoji: '🍓', tint: '#FFE3E3' }),
+
+  // Unit 15 · At the Zoo
+  elephant: w('elephant', 'con voi', { emoji: '🐘', tint: '#E4E2F5' }),
+  lion: w('lion', 'sư tử', { emoji: '🦁', tint: '#FFF3BF' }),
+  monkey: w('monkey', 'con khỉ', { emoji: '🐒', tint: '#F3E3C8' }),
+  giraffe: w('giraffe', 'hươu cao cổ', { emoji: '🦒', tint: '#FFE6CC' }),
+  zebra: w('zebra', 'ngựa vằn', { emoji: '🦓', tint: '#E4E2F5' }),
+  panda: w('panda', 'gấu trúc', { emoji: '🐼', tint: '#DDF6D8' }),
+
+  // Unit 16 · Transportation (car comes from Unit 8)
+  bus: w('bus', 'xe buýt', { emoji: '🚌', tint: '#FFF3BF' }),
+  bike: w('bike', 'xe đạp', { emoji: '🚲', tint: '#DDF6D8' }),
+  train: w('train', 'tàu hỏa', { emoji: '🚆', tint: '#DDEBFF' }),
+  plane: w('plane', 'máy bay', { emoji: '✈️', tint: '#D5F3F7' }),
+  boat: w('boat', 'tàu thủy', { emoji: '⛵', tint: '#E8DDFB' }),
 };
 
 export const COLOR_HEX: Record<string, string> = {
