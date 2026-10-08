@@ -15,6 +15,64 @@ interface Props {
   onComplete: () => void;
 }
 
+/** Crisp vector badge (the old bitmap one went soft at the star's lower edge). */
+const GreatJobBadge: React.FC = () => (
+  <svg viewBox="0 0 400 450" role="img" aria-label="Great Job!" className="relative mx-auto mt-6 w-[72%] a-bob drop-shadow-2xl">
+    <defs>
+      <linearGradient id="gj-star" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#FFD93B" />
+        <stop offset="1" stopColor="#FF9F0A" />
+      </linearGradient>
+      <linearGradient id="gj-inner" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#FFF59A" />
+        <stop offset="1" stopColor="#FFD23F" />
+      </linearGradient>
+      <linearGradient id="gj-rib" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#B07BFF" />
+        <stop offset="1" stopColor="#7A3FE0" />
+      </linearGradient>
+    </defs>
+    <polygon
+      points="200.0,55.0 254.1,130.6 342.7,158.6 287.5,233.4 288.2,326.4 200.0,297.0 111.8,326.4 112.5,233.4 57.3,158.6 145.9,130.6"
+      fill="url(#gj-star)"
+      stroke="#E8890C"
+      strokeWidth="30"
+      strokeLinejoin="round"
+    />
+    <polygon
+      points="200.0,55.0 254.1,130.6 342.7,158.6 287.5,233.4 288.2,326.4 200.0,297.0 111.8,326.4 112.5,233.4 57.3,158.6 145.9,130.6"
+      fill="url(#gj-star)"
+      stroke="url(#gj-star)"
+      strokeWidth="24"
+      strokeLinejoin="round"
+    />
+    <polygon
+      points="200.0,87.0 242.3,146.8 312.2,168.5 268.5,227.2 269.4,300.5 200.0,277.0 130.6,300.5 131.5,227.2 87.8,168.5 157.7,146.8"
+      fill="url(#gj-inner)"
+      stroke="url(#gj-inner)"
+      strokeWidth="14"
+      strokeLinejoin="round"
+    />
+    <image href="/art/pip_fly.png" x="112" y="112" width="176" height="160" />
+    <path d="M52 352 L112 352 L126 382 L112 412 L52 412 L72 382 Z" fill="#6D2FD0" />
+    <path d="M348 352 L288 352 L274 382 L288 412 L348 412 L328 382 Z" fill="#6D2FD0" />
+    <rect x="86" y="338" width="228" height="76" rx="16" fill="url(#gj-rib)" stroke="#5B21B6" strokeWidth="4" />
+    <text
+      x="200"
+      y="390"
+      textAnchor="middle"
+      fontSize="38"
+      fontWeight="700"
+      fill="#fff"
+      stroke="#4C1D95"
+      strokeWidth="1.5"
+      style={{ fontFamily: 'Fredoka, Nunito, sans-serif' }}
+    >
+      Great Job!
+    </text>
+  </svg>
+);
+
 export const RewardScreen: React.FC<Props> = ({ lesson, nav, lessonStars, collected, onComplete }) => {
   useEffect(() => {
     onComplete();
@@ -34,12 +92,7 @@ export const RewardScreen: React.FC<Props> = ({ lesson, nav, lessonStars, collec
         <div className="sunburst a-spin absolute left-1/2 top-[-6%] w-[150%] aspect-square -translate-x-1/2" />
         <Sparkles n={8} />
 
-        <img
-          src="/art/star_badge.png"
-          alt="Great Job!"
-          className="relative mx-auto mt-6 w-[72%] a-bob drop-shadow-2xl"
-          draggable={false}
-        />
+        <GreatJobBadge />
 
         <div className="relative mx-auto mt-3 w-fit rounded-full bg-white/90 px-5 py-1.5 text-center text-lg font-black text-amber-600 shadow">
           Bé nhận được {lessonStars} ⭐ trong bài này!

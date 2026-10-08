@@ -90,7 +90,7 @@ export const SayItScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, na
               </div>
             </div>
 
-            <div className="mt-5 flex items-center justify-center gap-5">
+            <div className="relative z-10 mt-5 flex items-center justify-center gap-5">
               <div className="flex flex-col items-center">
                 <div className="relative">
                   {mic.state === 'listening' && (
@@ -116,7 +116,7 @@ export const SayItScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, na
               <Stars value={mic.state === 'done' ? mic.stars : 0} size="text-4xl" />
             </div>
 
-            <div className="mt-3 flex justify-center">
+            <div className="relative z-10 mt-3 flex justify-center">
               <button
                 onClick={advance}
                 className="flex items-center gap-1.5 rounded-full bg-white/70 px-4 py-1.5 text-sm font-black text-slate-500 active:scale-95"
@@ -133,16 +133,16 @@ export const SayItScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, na
             <img
               src="/art/mi.png"
               alt="Mi"
-              className="absolute left-0 bottom-0 w-[38%] drop-shadow-xl"
+              className="pointer-events-none absolute left-0 bottom-0 w-20 drop-shadow-xl"
               draggable={false}
             />
-            <div className="absolute right-2 bottom-2 flex flex-col items-end">
+            <div className="pointer-events-none absolute right-2 bottom-2 flex flex-col items-end">
               {praise && (
                 <Bubble tail="r" className="mb-3 max-w-[11rem] px-3 py-2 text-center text-sm leading-snug a-pop">
                   {praise}
                 </Bubble>
               )}
-              <img src="/art/pip_sit.png" alt="Pip" className="w-24 a-bob drop-shadow-lg" draggable={false} />
+              <img src="/art/pip_sit.png" alt="Pip" className="w-16 a-bob drop-shadow-lg" draggable={false} />
             </div>
           </>
         )}
