@@ -31,3 +31,5 @@ assets_extracted/
 # source mockups (large) and local tooling
 PHOTO/
 .claude/
+
+!.env.example

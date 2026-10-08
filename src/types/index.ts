@@ -97,3 +97,18 @@ export interface LevelInfo {
   cefr: string;
   blurb: string;
 }
+
+export type StudentStatus = 'pending' | 'approved' | 'blocked';
+
+/** A student account record, stored in Firestore under students/<email>. */
+export interface Student {
+  email: string;
+  name: string;
+  photoURL: string;
+  status: StudentStatus;
+  /** "self" = the student signed in and is waiting for approval, "admin" = the admin handed out this Gmail */
+  source: 'self' | 'admin';
+  createdAt: number;
+  updatedAt: number;
+  approvedBy?: string;
+}

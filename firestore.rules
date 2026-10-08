@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function me() {
+      return request.auth.token.email.lower();
+    }
+    // Keep in sync with ADMIN_EMAIL in src/lib/config.ts
+    function isAdmin() {
+      return signedIn() && me() == 'nguyentoandinh.0511@gmail.com';
+    }
+
+    match /students/{email} {
+      // a student reads only their own record; the admin reads everything
+      allow read: if isAdmin() || (signedIn() && email == me());
+      // first sign-in: a student may only register themselves as "pending"
+      allow create: if isAdmin() || (
+        signedIn() && email == me()
+        && request.resource.data.email == me()
+        && request.resource.data.status == 'pending'
+        && request.resource.data.source == 'self'
+      );
+      // approving, blocking and deleting are admin-only
+      allow update, delete: if isAdmin();
+    }
+  }
+}

@@ -7,6 +7,8 @@ import { Song } from '../../types';
 import { playPopSound } from '../../utils/audio';
 import { SongThumb } from '../ui/Song';
 import { InstallButton } from '../InstallButton';
+import { canOpenUnit } from '../../data/access';
+import { AuthApi } from '../../hooks/useAuth';
 
 interface Props {
   stars: number;
@@ -15,9 +17,11 @@ interface Props {
   onStart: (lessonId: string) => void;
   onOpenStickers: () => void;
   onPlaySong: (song: Song) => void;
+  auth: AuthApi;
+  onAccount: () => void;
 }
 
-export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, onOpenStickers, onPlaySong }) => {
+export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, onOpenStickers, onPlaySong, auth, onAccount }) => {
   const [level, setLevel] = useState<1 | 2 | 3>(1);
   const [toast, setToast] = useState('');
   const info = LEVELS[level - 1];
@@ -42,8 +46,28 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
             className="block w-full"
             style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, #000 9%)', maskImage: 'linear-gradient(to bottom, transparent 0, #000 9%)' }}
           />
-          <div className="absolute left-3 top-3">
+          <div className="absolute left-3 top-3 flex items-center gap-2">
             <InstallButton />
+            {auth.enabled && (
+              <button
+                onClick={() => {
+                  playPopSound();
+                  onAccount();
+                }}
+                aria-label="Tài khoản"
+                className="relative flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1.5 text-sm font-black text-sky-700 shadow active:scale-95"
+              >
+                {auth.user?.photoURL ? (
+                  <img src={auth.user.photoURL} alt="" referrerPolicy="no-referrer" className="h-5 w-5 rounded-full" />
+                ) : (
+                  <span>👤</span>
+                )}
+                {!auth.user && <span className="text-xs">Đăng nhập</span>}
+                {auth.isAdmin && auth.students.some((s) => s.status === 'pending') && (
+                  <span className="absolute -right-1 -top-1 h-3.5 w-3.5 rounded-full bg-rose-500 ring-2 ring-white" />
+                )}
+              </button>
+            )}
           </div>
           <div className="absolute right-3 top-3 flex items-center gap-2">
             <div className="flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 text-sm font-black text-amber-600 shadow">
@@ -190,6 +214,7 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
                       );
                     }
                     const isDone = l.id in done;
+                    const locked = !canOpenUnit(auth.status, u.code);
                     return (
                       <button
                         key={no}
@@ -198,10 +223,10 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
                           onStart(l.id);
                         }}
                         className={`relative h-8 flex-1 rounded-lg text-sm font-black text-white active:scale-95 ${
-                          isDone ? 'bg-green-500' : 'bg-gradient-to-b from-orange-400 to-orange-500 shadow-[0_3px_0_#c2570c]'
+                          locked ? 'bg-slate-200 text-slate-400' : isDone ? 'bg-green-500' : 'bg-gradient-to-b from-orange-400 to-orange-500 shadow-[0_3px_0_#c2570c]'
                         }`}
                       >
-                        {isDone ? <Check className="mx-auto w-4 h-4" strokeWidth={4} /> : `B${no}`}
+                        {locked ? <Lock className="mx-auto w-3.5 h-3.5" /> : isDone ? <Check className="mx-auto w-4 h-4" strokeWidth={4} /> : `B${no}`}
                       </button>
                     );
                   })}
