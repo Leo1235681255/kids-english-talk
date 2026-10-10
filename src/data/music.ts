@@ -18,7 +18,7 @@ export const SONGS: Song[] = [
   { unit: 'L1-U05', videoId: 'ZUbGYLuJLi8', title: 'My Body Song' },
   { unit: 'L1-U06', videoId: '5EKLw-pCL7w', title: 'Animals Song' },
   { unit: 'L1-U07', videoId: 'hAlIKBQOBgc', title: 'Yummy Food Song' },
-  { unit: 'L1-U08', videoId: '1GpQ1Oqovok', title: 'My Toys Song' },
+  { unit: 'L1-U08', videoId: 'KOMkPTQj5fw', title: 'My Toys Song' },
   { unit: 'L1-U09', videoId: 'BmUGAMT1iLo', title: 'My School Song' },
   { unit: 'L1-U10', videoId: 'csgUtXui3r4', title: 'Feelings Song' },
   { unit: 'L1-U11', videoId: 'NRDNbThmJ1M', title: 'Clothes Song' },
