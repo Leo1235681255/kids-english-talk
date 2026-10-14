@@ -5,6 +5,7 @@ import { Nav, ScreenFrame } from '../HeaderNavbar';
 import { Bubble, SpeakerBtn, WordArt } from '../ui/Art';
 import { COLOR_HEX, wordOf } from '../../data/words';
 import { shuffle } from '../../utils/shuffle';
+import { fitText } from '../../utils/fit';
 import { playErrorSound, playPopSound, playSuccessSound, speakText } from '../../utils/audio';
 
 interface GameProps {
@@ -98,7 +99,7 @@ const MatchGame: React.FC<GameProps> = ({ ids, earn, onDone }) => {
                   setDrag(toLocal(e.clientX, e.clientY));
                 }}
                 style={{ height: ROW_H, touchAction: 'none' }}
-                className={`card grid place-items-center text-[1.9rem] font-black text-[#0f3a8a] cursor-pointer ${
+                className={`card grid place-items-center px-2 text-center leading-tight ${fitText(wordOf(id).en, ['text-[1.9rem]', 'text-[1.4rem]', 'text-[1.1rem]', 'text-[0.95rem]'], [6, 9, 13])} font-black text-[#0f3a8a] cursor-pointer ${
                   selected === id ? 'ring-4 ring-sky-400' : ''
                 } ${bad === id ? 'card-bad' : ''} ${done ? 'opacity-70' : ''}`}
               >
@@ -117,7 +118,7 @@ const MatchGame: React.FC<GameProps> = ({ ids, earn, onDone }) => {
               style={{ height: ROW_H }}
               className={`card grid place-items-center cursor-pointer ${matched.includes(id) ? 'opacity-70' : ''}`}
             >
-              <WordArt word={wordOf(id)} className="h-[4.3rem] w-[4.3rem]" emojiSize="text-5xl" />
+              <WordArt word={wordOf(id)} className="h-[4.3rem] w-[4.3rem]" emojiSize="text-5xl" wideClass="w-[88%]" />
             </div>
           ))}
         </div>
@@ -235,7 +236,7 @@ const TapFindGame: React.FC<GameProps> = ({ ids, earn, onDone }) => {
                 wrong.includes(id) && !isFound ? 'card-bad' : ''
               }`}
             >
-              <WordArt word={wordOf(id)} className="h-[6rem] w-[6rem]" emojiSize="text-6xl" />
+              <WordArt word={wordOf(id)} className="h-[6rem] w-[6rem]" emojiSize="text-6xl" wideClass="w-[94%]" />
             </button>
           );
         })}

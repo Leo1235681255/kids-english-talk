@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Play } from 'lucide-react';
 import { Line, Lesson, Speaker } from '../../types';
 import { Nav, ScreenFrame } from '../HeaderNavbar';
-import { speakText, stopSpeaking } from '../../utils/audio';
+import { playPopSound, speakText, stopSpeaking } from '../../utils/audio';
 import { SPEAKERS } from '../../data/speakers';
 
 const PANEL_BG = [
@@ -60,6 +60,8 @@ export const StoryTimeScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson
   );
 
   const title = lesson.story?.title ?? lesson.title;
+  const questions = lesson.story?.questions ?? [];
+  const [shownAnswers, setShownAnswers] = useState<Set<number>>(new Set());
 
   return (
     <ScreenFrame screen="storytime" {...nav} nextReady={read}>
@@ -115,6 +117,36 @@ export const StoryTimeScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson
             </div>
           ))}
         </div>
+
+        {questions.length > 0 && (
+          <div className="mt-3 rounded-2xl bg-white/90 px-3 py-3 shadow">
+            <div className="text-base font-black text-purple-700">❓ Answer the questions</div>
+            <div className="text-[11px] font-semibold text-slate-400">Trả lời trước, rồi bấm vào câu hỏi để xem đáp án</div>
+            <ul className="mt-2 space-y-2">
+              {questions.map((q, i) => {
+                const open = shownAnswers.has(i);
+                return (
+                  <li key={i}>
+                    <button
+                      onClick={() => {
+                        playPopSound();
+                        setShownAnswers((x) => new Set(x).add(i));
+                        speakText(q.q, { speaker: 'Pip', rate: 0.9 });
+                      }}
+                      className="w-full rounded-xl bg-purple-50 px-3 py-2 text-left active:scale-[0.99]"
+                    >
+                      <div className="text-[0.95rem] font-black leading-snug text-[#0f3a8a]">
+                        {i + 1}. {q.q}
+                      </div>
+                      <div className="text-[11px] font-semibold text-slate-400">{q.vi}</div>
+                      {open && <div className="mt-1 rounded-lg bg-green-100 px-2 py-1 text-sm font-black text-green-700 a-pop">→ {q.a}</div>}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
         <div className="mt-3 flex items-end gap-2">
           <img src="/art/pip_sit.png" alt="Pip" className="w-24 a-bob drop-shadow-lg" draggable={false} />

@@ -1,5 +1,6 @@
 import { Word } from '../types';
 import { L2_WORDS } from './words2';
+import { L3_WORDS } from './words3';
 
 const w = (id: string, vi: string, o: Partial<Word> = {}): Word => ({ id, en: o.en ?? id, vi, ...o });
 /** picture word: cut-out art from public/art */
@@ -154,6 +155,9 @@ export const WORDS: Record<string, Word> = {
 
   // Level 2 · Explorer
   ...L2_WORDS,
+
+  // Level 3 · Adventurer
+  ...L3_WORDS,
 };
 
 export const COLOR_HEX: Record<string, string> = {

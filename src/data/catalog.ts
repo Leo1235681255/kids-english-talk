@@ -1,10 +1,10 @@
 import { LevelInfo, Unit } from '../types';
 
-/** Three levels in total; Starter and Explorer are laid out now, Adventurer comes later. */
+/** Three levels, 16 units each. */
 export const LEVELS: LevelInfo[] = [
   { level: 1, name: 'Starter', age: '4–6 tuổi', cefr: 'Pre-A1', blurb: 'Quyển 1 · 16 unit · nghe hiểu, nói từ đơn và câu 2–5 từ' },
   { level: 2, name: 'Explorer', age: '6–8 tuổi', cefr: 'A1', blurb: 'Quyển 2 · 16 unit · câu tối đa 8 từ, mỗi unit một trọng tâm ngữ pháp' },
-  { level: 3, name: 'Adventurer', age: '8–10 tuổi', cefr: 'A1–A2', blurb: 'Quyển 3 · sắp ra mắt' },
+  { level: 3, name: 'Adventurer', age: '8–10 tuổi', cefr: 'A1–A2', blurb: 'Quyển 3 · 16 unit · câu tối đa 12 từ, quá khứ, tương lai, đọc hiểu và viết ngắn' },
 ];
 
 const GRADIENTS = [
@@ -38,7 +38,7 @@ const u = (
   color: GRADIENTS[(Number(code.slice(-2)) - 1) % GRADIENTS.length],
 });
 
-/** Source of truth: PHOTO/KidsEnglishTalk_Starter_16_Units.md and ..._Quyen2_Explorer_16_Units.md */
+/** Source of truth: PHOTO/KidsEnglishTalk_Starter_16_Units.md and ..._Quyen2_Explorer_16_Units.md and ..._Quyen3_Adventurer_16_Units.md */
 export const UNITS: Unit[] = [
   // Level 1 · Starter · Quyển 1
   u('L1-U01', 'Hello, Friends!', 'Hello!', 'Chào hỏi', "What's your name? — I'm Mi.", 'hello, hi, goodbye, name, friend, boy, girl', '👋'),
@@ -75,6 +75,24 @@ export const UNITS: Unit[] = [
   u('L2-U14', 'I Like Summer!', 'Seasons', 'Các mùa trong năm', "What's your favorite season? — I like summer.", 'spring, summer, fall, winter, warm, cool, season', '🍂'),
   u('L2-U15', 'This Is for You!', 'Happy Birthday!', 'Sinh nhật', 'Happy birthday! This is for you. — Thank you!', 'birthday, cake, candle, present, balloon, card, party', '🎂'),
   u('L2-U16', 'Happy New Year!', 'Tet Holiday', 'Tết Nguyên đán', 'Happy New Year!', 'Tet, New Year, lucky money, fireworks, banh chung, peach blossom, lion dance', '🧧'),
+
+  // Level 3 · Adventurer · Quyển 3
+  u('L3-U01', 'This Is Me!', 'All About Me', 'Giới thiệu bản thân', 'Where do you live? — I live in Ha Noi.', 'live, hometown, grade, favorite, subject, Math, Art, P.E.', '🙋'),
+  u('L3-U02', 'I Like Reading Comics!', 'Hobbies', 'Sở thích', 'What do you like doing in your free time?', 'hobby, free time, reading comics, playing chess, painting, gardening, collecting stamps, skateboarding', '🎨'),
+  u('L3-U03', 'How Much Is It?', 'Shopping', 'Đi mua sắm', 'How much is this T-shirt?', 'price, cheap, expensive, buy, sell, thousand, money, change', '🛒'),
+  u('L3-U04', "I'd Like Noodles, Please!", 'At the Restaurant', 'Ở nhà hàng', 'What would you like?', 'menu, waiter, order, a bowl of, a glass of, spicy, delicious, bill', '🍜'),
+  u('L3-U05', 'Go Straight and Turn Left!', 'Asking the Way', 'Hỏi đường', "Excuse me, where's the post office?", 'turn left, turn right, go straight, corner, traffic lights, opposite, between, post office', '🧭'),
+  u('L3-U06', "What's the Matter?", 'Staying Healthy', 'Sức khỏe', "What's the matter? — I have a headache.", 'headache, toothache, stomachache, cold, fever, cough, medicine, rest', '🩺'),
+  u('L3-U07', 'I Always Make My Bed!', 'Helping at Home', 'Giúp việc nhà', 'How often do you wash the dishes?', 'make the bed, wash the dishes, sweep the floor, water the plants, take out the trash, fold the clothes, always, never', '🧹'),
+  u('L3-U08', 'Bigger and Faster!', 'Wild Animals', 'Động vật hoang dã', 'A tiger is faster than a crocodile.', 'tiger, crocodile, kangaroo, penguin, camel, bear, owl, than', '🐯'),
+  u('L3-U09', 'What Did You Do?', 'Last Weekend', 'Cuối tuần trước', 'What did you do last weekend?', 'yesterday, last weekend, visited, played, watched, cleaned, cooked, stayed at home', '📸'),
+  u('L3-U10', 'Where Did You Go?', 'My Holiday', 'Kỳ nghỉ của em', 'Where did you go on holiday?', 'holiday, went, saw, ate, swam, bought, took photos, souvenir', '🏖️'),
+  u('L3-U11', "Let's Celebrate!", 'Festivals', 'Lễ hội', "When is Children's Day? — It's on June 1st.", "festival, celebrate, Mid-Autumn Festival, lantern, mooncake, full moon, Christmas, Teachers' Day", '🏮'),
+  u('L3-U12', 'Could You Help Me, Please?', 'Good Manners', 'Phép lịch sự', 'Could you help me, please? — Sure!', 'polite, excuse me, sorry, share, borrow, take turns, line up, kind', '🤝'),
+  u('L3-U13', 'We Must Recycle!', 'Save Our Planet', 'Bảo vệ Trái Đất', 'We must recycle plastic bottles.', 'planet, recycle, plastic, trash, save water, turn off, plant trees, reuse', '🌍'),
+  u('L3-U14', 'To the Moon!', 'Space Adventure', 'Phiêu lưu vũ trụ', "I'm going to be an astronaut.", 'space, astronaut, rocket, Earth, Mars, star, telescope, float', '🚀'),
+  u('L3-U15', "Let's Go Camping!", 'Camping Trip', 'Đi cắm trại', "We'll take a tent and a flashlight.", 'camping, tent, campfire, flashlight, map, backpack, forest, river', '⛺'),
+  u('L3-U16', 'Where Are You From?', 'Around the World', 'Vòng quanh thế giới', "Where are you from? — I'm from Vietnam.", 'country, Vietnam, Japan, Australia, the USA, the UK, France, language', '🌏'),
 ];
 
 export const unitsOfLevel = (level: number) => UNITS.filter((x) => x.level === level);

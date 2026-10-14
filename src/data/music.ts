@@ -4,12 +4,13 @@ import { Song } from '../types';
 export const PLAYLIST_IDS: Record<number, string> = {
   1: 'PLTAl47Gy1NmY',
   2: 'PLTQTUbc8FRiY',
+  3: 'PLb23cjJVfBv8',
 };
 export const levelOfUnit = (unit: string) => Number(unit[1]);
 export const playlistUrl = (level: number) => `https://www.youtube.com/playlist?list=${PLAYLIST_IDS[level] ?? PLAYLIST_IDS[1]}`;
 export const CHANNEL_NAME = 'Leo English';
 
-/** One karaoke song per unit; all 16 Starter and 16 Explorer units are published. */
+/** One karaoke song per unit; all 16 Starter, 16 Explorer and 16 Adventurer units are published. */
 export const SONGS: Song[] = [
   { unit: 'L1-U01', videoId: 'MgKcgnmgyZ4', title: 'Hello & Friends Song' },
   { unit: 'L1-U02', videoId: 'wNt-9bWZexo', title: 'My Family Song' },
@@ -43,6 +44,22 @@ export const SONGS: Song[] = [
   { unit: 'L2-U14', videoId: 'iYefRlMuNfU', title: 'I Like Summer Song' },
   { unit: 'L2-U15', videoId: 'zb0a6BN79Mw', title: 'This Is for You Song' },
   { unit: 'L2-U16', videoId: 'hUoLqO6iV5g', title: 'Happy New Year Song' },
+  { unit: 'L3-U01', videoId: 'XPM-0GRKElI', title: 'All About Me Song' },
+  { unit: 'L3-U02', videoId: 'gX3zJJhWpHY', title: 'Free Time Song' },
+  { unit: 'L3-U03', videoId: '32ZhdMeTn_4', title: 'Shopping Day Song' },
+  { unit: 'L3-U04', videoId: 'iMaFO-C9VSA', title: 'Restaurant Song' },
+  { unit: 'L3-U05', videoId: 'i08K_NAOTs8', title: 'Which Way? Song' },
+  { unit: 'L3-U06', videoId: 'L3YV2vb1pEs', title: 'Healthy Me Song' },
+  { unit: 'L3-U07', videoId: 'uv3ZQMCKmU8', title: 'Helping Hands Song' },
+  { unit: 'L3-U08', videoId: 'cUTb8dFsV0g', title: 'Wild and Wonderful Song' },
+  { unit: 'L3-U09', videoId: 'TR-DHs7kkk0', title: 'Last Weekend Song' },
+  { unit: 'L3-U10', videoId: 'yVD-58lbGEc', title: 'Holiday Memories Song' },
+  { unit: 'L3-U11', videoId: 'U5dVa8Q0KEg', title: 'Festivals Song' },
+  { unit: 'L3-U12', videoId: 'Ws4tolBKdFc', title: 'Magic Manners Song' },
+  { unit: 'L3-U13', videoId: 'IzH7nhGuLI4', title: 'Green Planet Song' },
+  { unit: 'L3-U14', videoId: 'fYMa1te_YqQ', title: 'To the Moon Song' },
+  { unit: 'L3-U15', videoId: 'Aa9O93sCuEk', title: 'Campfire Song' },
+  { unit: 'L3-U16', videoId: 'dyVzDm67AnE', title: 'Where Are You From Song' },
 ];
 
 export const songOf = (unit: string): Song | undefined => SONGS.find((s) => s.unit === unit);

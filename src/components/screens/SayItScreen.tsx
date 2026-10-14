@@ -4,6 +4,7 @@ import { Lesson, Word } from '../../types';
 import { Nav, ScreenFrame } from '../HeaderNavbar';
 import { Bubble, SpeakerBtn, Stars, WordArt } from '../ui/Art';
 import { wordOf } from '../../data/words';
+import { fitText } from '../../utils/fit';
 import { useMic } from '../../hooks/useMic';
 import { playStarSound, speakText } from '../../utils/audio';
 
@@ -77,7 +78,7 @@ export const SayItScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson, na
                 {item.kind === 'word' ? (
                   <>
                     <WordArt word={item.word} className="h-36 w-36" emojiSize="text-8xl" />
-                    <div className="mt-1 text-[2.3rem] leading-none font-black text-[#0f3a8a]">{item.word.en}</div>
+                    <div className={`mt-1 ${fitText(item.word.en, ['text-[2.3rem]', 'text-[1.9rem]', 'text-[1.5rem]', 'text-[1.25rem]'], [9, 12, 17])} text-center leading-tight font-black text-[#0f3a8a]`}>{item.word.en}</div>
                     <div className="text-sm font-bold text-slate-400">{item.word.vi}</div>
                   </>
                 ) : (

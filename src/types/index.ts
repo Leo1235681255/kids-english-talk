@@ -11,7 +11,7 @@ export type ScreenType =
   | 'review'
   | 'forparents';
 
-export type Speaker = 'Mi' | 'Bin' | 'Pip' | 'Miss Hoa' | 'Lan' | 'Mom' | 'Grandma' | 'Ant' | 'Little Crab' | 'Dolphin' | 'Octopus';
+export type Speaker = 'Mi' | 'Bin' | 'Pip' | 'Miss Hoa' | 'Lan' | 'Mom' | 'Grandma' | 'Ant' | 'Little Crab' | 'Dolphin' | 'Octopus' | 'Tom' | 'Yuki' | 'Shopkeeper' | 'Tourist' | 'Nurse' | 'Waiter' | 'Dad';
 
 /** A vocabulary item. `art` is a transparent PNG in /art, otherwise `emoji` is drawn big on a tinted tile. */
 export interface Word {
@@ -26,6 +26,8 @@ export interface Word {
   digit?: string;
   /** art is a pastel portrait tile: draw it with rounded corners */
   framed?: boolean;
+  /** art is a wide (about 2:1) picture: keep its shape instead of squeezing it into a square */
+  wide?: boolean;
 }
 
 export interface Line {
@@ -48,6 +50,18 @@ export interface Sticker {
   emoji?: string;
 }
 
+export interface StoryQuestion {
+  q: string;
+  vi: string;
+  a: string;
+}
+
+export interface QuizQuestion {
+  q: string;
+  options: string[];
+  answer: number;
+}
+
 export interface Lesson {
   id: string; // L1-U01-B1
   unitCode: string; // L1-U01
@@ -65,7 +79,11 @@ export interface Lesson {
   sentences: Phrase[];
   talk: { scene: string; lines: Line[]; roleplay: 'Mi' | 'Bin' };
   game: { kind: GameKind; prompt: string; ids: string[] };
-  story?: { title: string; pages: Line[] };
+  story?: { title: string; pages: Line[]; questions?: StoryQuestion[] };
+  /** multiple-choice review questions (Level 3) */
+  quiz?: QuizQuestion[];
+  /** short writing task (Level 3) */
+  write?: string;
   sticker: Sticker;
   parent: { learned: string; patterns: string[]; tips: string[] };
 }

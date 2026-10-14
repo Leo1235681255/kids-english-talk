@@ -14,5 +14,12 @@ export const SPEAKERS: Record<Speaker, { avatar: string; chip: string; voice: Vo
   Ant: { avatar: '/art/sp_ant.png', chip: 'bg-red-500 text-white', voice: 'Pip' },
   'Little Crab': { avatar: '/art/sp_crab.png', chip: 'bg-red-400 text-white', voice: 'Bin' },
   Dolphin: { avatar: '/art/sp_dolphin.png', chip: 'bg-sky-500 text-white', voice: 'Mi' },
+  Tom: { avatar: '/art/sp_tom.svg', chip: 'bg-green-500 text-white', voice: 'Bin' },
+  Yuki: { avatar: '/art/sp_yuki.svg', chip: 'bg-pink-400 text-white', voice: 'Mi' },
+  Shopkeeper: { avatar: '/art/sp_shopkeeper.svg', chip: 'bg-amber-500 text-white', voice: 'Teacher' },
+  Tourist: { avatar: '/art/sp_tourist.svg', chip: 'bg-sky-500 text-white', voice: 'Teacher' },
+  Nurse: { avatar: '/art/sp_nurse.svg', chip: 'bg-teal-500 text-white', voice: 'Teacher' },
+  Waiter: { avatar: '/art/sp_waiter.svg', chip: 'bg-orange-500 text-white', voice: 'Teacher' },
+  Dad: { avatar: '/art/sp_dad.svg', chip: 'bg-indigo-500 text-white', voice: 'Bin' },
   Octopus: { avatar: '/art/sp_octopus.png', chip: 'bg-fuchsia-500 text-white', voice: 'Bin' },
 };

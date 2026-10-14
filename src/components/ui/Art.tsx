@@ -3,10 +3,11 @@ import { Volume2 } from 'lucide-react';
 import { Word } from '../../types';
 
 /** A word's picture: a cut-out illustration when we have one, otherwise a big emoji on a tinted tile. */
-export const WordArt: React.FC<{ word: Word; className?: string; emojiSize?: string }> = ({
+export const WordArt: React.FC<{ word: Word; className?: string; emojiSize?: string; wideClass?: string }> = ({
   word,
   className = '',
   emojiSize = 'text-7xl',
+  wideClass = 'w-full',
 }) => {
   if (word.digit) {
     const palette = ['#EF4444', '#3B82F6', '#EAB308', '#22C55E', '#EC4899', '#F97316', '#8B5CF6', '#06B6D4', '#EF4444', '#3B82F6'];
@@ -24,6 +25,19 @@ export const WordArt: React.FC<{ word: Word; className?: string; emojiSize?: str
           {word.digit}
         </span>
       </div>
+    );
+  }
+  if (word.art && word.wide) {
+    // wide pictures keep their shape: the caller's square h-/w- size is replaced by wideClass
+    const rest = className.split(' ').filter((c) => c && !/^(h|w)-/.test(c));
+    return (
+      <img
+        src={word.art}
+        alt={word.en}
+        draggable={false}
+        loading="lazy"
+        className={`aspect-[2.1/1] object-cover shadow-md rounded-xl ${wideClass} ${rest.join(' ')}`}
+      />
     );
   }
   if (word.art) {

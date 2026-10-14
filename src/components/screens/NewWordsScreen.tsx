@@ -4,6 +4,7 @@ import { Lesson } from '../../types';
 import { Nav, ScreenFrame } from '../HeaderNavbar';
 import { Bubble, SpeakerBtn, WordArt } from '../ui/Art';
 import { wordOf } from '../../data/words';
+import { fitText } from '../../utils/fit';
 import { playPopSound, speakSlow, speakText } from '../../utils/audio';
 
 /** Shared by New Words and Review: a grid of tappable flashcards. */
@@ -42,7 +43,7 @@ export const FlashGrid: React.FC<{
               className={compact ? 'h-24 w-24' : 'h-28 w-28'}
               emojiSize={compact ? 'text-6xl' : 'text-7xl'}
             />
-            <div className="mt-1 text-[1.65rem] leading-none font-black text-[#0f3a8a]">{w.en}</div>
+            <div className={`mt-1 ${fitText(w.en, ['text-[1.65rem]', 'text-[1.35rem]', 'text-[1.1rem]', 'text-[0.95rem]'])} text-center leading-tight font-black text-[#0f3a8a]`}>{w.en}</div>
             <div className="text-xs font-bold text-slate-400 mt-0.5">{w.vi}</div>
             <div className="mt-2 flex items-center gap-2">
               <SpeakerBtn onClick={() => hear(w.id)} active={active === w.id} />

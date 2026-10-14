@@ -5,6 +5,7 @@ import { Nav, ScreenFrame } from '../HeaderNavbar';
 import { Bubble, SpeakerBtn, WordArt } from '../ui/Art';
 import { FILLERS, wordOf } from '../../data/words';
 import { shuffle } from '../../utils/shuffle';
+import { fitText } from '../../utils/fit';
 import { playErrorSound, playSuccessSound, speakText } from '../../utils/audio';
 
 interface Question {
@@ -13,7 +14,8 @@ interface Question {
 }
 
 const buildQuestions = (lesson: Lesson): Question[] => {
-  const pool = [...new Set([...lesson.words, ...(lesson.extras ?? []), ...FILLERS])];
+  const own = [...new Set([...lesson.words, ...(lesson.extras ?? [])])];
+  const pool = own.length >= 4 ? own : [...new Set([...own, ...FILLERS])];
   const targets = shuffle(lesson.words).slice(0, 6);
   return targets.map((id) => {
     const wrong = shuffle(pool.filter((p) => p !== id)).slice(0, 3);
@@ -91,7 +93,7 @@ export const ListenTapScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson
             {/* question bubble */}
             <Bubble tail="l" className="flex items-center gap-4 px-4 py-3 !rounded-[1.8rem]">
               <SpeakerBtn size="lg" onClick={say} />
-              <span className="text-[2.4rem] leading-none font-black">{q.target.en}</span>
+              <span className={`${fitText(q.target.en, ['text-[2.4rem]', 'text-[1.9rem]', 'text-[1.5rem]', 'text-[1.25rem]'])} leading-tight font-black`}>{q.target.en}</span>
             </Bubble>
 
             <div className="mt-7 grid grid-cols-2 gap-3.5">
@@ -106,7 +108,7 @@ export const ListenTapScreen: React.FC<{ lesson: Lesson; nav: Nav }> = ({ lesson
                       isWrong ? 'card-bad opacity-60' : ''
                     } ${hint === w.id && !right ? 'ring-4 ring-amber-300 a-pop' : ''}`}
                   >
-                    <WordArt word={w} className="h-[8.2rem] w-[8.2rem]" emojiSize="text-7xl" />
+                    <WordArt word={w} className="h-[8.2rem] w-[8.2rem]" emojiSize="text-7xl" wideClass="w-full" />
                   </button>
                 );
               })}
