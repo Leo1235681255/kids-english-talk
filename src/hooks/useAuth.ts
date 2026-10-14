@@ -28,7 +28,11 @@ const friendly = (e: unknown) => {
   const code = (e as { code?: string })?.code ?? '';
   if (code === 'permission-denied') return 'Chưa có quyền truy cập dữ liệu. Admin cần kiểm tra lại luật Firestore.';
   if (code.startsWith('auth/network')) return 'Mất mạng rồi, bé thử lại nhé.';
-  return 'Có lỗi xảy ra, thử lại sau nhé.';
+  if (code === 'auth/unauthorized-domain') return `Tên miền ${location.hostname} chưa được thêm vào Firebase (Authentication → Settings → Authorized domains).`;
+  if (code === 'auth/operation-not-allowed') return 'Chưa bật đăng nhập Google trong Firebase (Authentication → Sign-in method → Google).';
+  if (code === 'auth/invalid-api-key' || code === 'auth/api-key-not-valid') return 'Khoá API Firebase chưa đúng. Admin kiểm tra lại cấu hình trên Vercel.';
+  if (code === 'unavailable' || code === 'failed-precondition') return 'Chưa tạo Firestore Database hoặc chưa kết nối được. Admin kiểm tra lại trong Firebase.';
+  return `Có lỗi xảy ra, thử lại sau nhé.${code ? ` (${code})` : ''}`;
 };
 
 export const useAuth = (): AuthApi => {
