@@ -22,8 +22,13 @@ service cloud.firestore {
         && request.resource.data.status == 'pending'
         && request.resource.data.source == 'self'
       );
+      // a student may only refresh their own device session (and name/photo); status is never theirs to change
+      allow update: if isAdmin() || (
+        signedIn() && email == me()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['session', 'name', 'photoURL'])
+      );
       // approving, blocking and deleting are admin-only
-      allow update, delete: if isAdmin();
+      allow delete: if isAdmin();
     }
   }
 }

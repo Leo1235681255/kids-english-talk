@@ -1,7 +1,7 @@
 /** All Firebase code lives here and is loaded on demand, so the app stays light when accounts are off. */
 import { initializeApp } from 'firebase/app';
 import { GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut, User } from 'firebase/auth';
-import { collection, deleteDoc, doc, getDoc, getFirestore, onSnapshot, setDoc } from 'firebase/firestore';
+import { collection, deleteDoc, deleteField, doc, getDoc, getFirestore, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { ADMIN_EMAIL, firebaseConfig } from './config';
 import { Student, StudentStatus } from '../types';
 
@@ -23,7 +23,47 @@ export const isAdminEmail = (email: string) => email.toLowerCase() === ADMIN_EMA
 
 export const subscribeAuth = (cb: (u: AuthUser | null) => void) => onAuthStateChanged(auth, (u) => cb(u && u.email ? toUser(u) : null));
 
+/* One device at a time: every sign-in takes over the account, and the device that was signed in before is signed out. */
+const SESSION_KEY = 'ket_session';
+const CLAIM_KEY = 'ket_claim';
+const store = {
+  get: (k: string) => {
+    try {
+      return localStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  set: (k: string, v: string) => {
+    try {
+      localStorage.setItem(k, v);
+    } catch {
+      /* private mode: this device can't be told apart from a fresh one */
+    }
+  },
+  del: (k: string) => {
+    try {
+      localStorage.removeItem(k);
+    } catch {
+      /* ignore */
+    }
+  },
+};
+
+const newId = () => (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+
+/** Short human label for the admin list, e.g. "Safari · iPhone". */
+const deviceLabel = () => {
+  const ua = navigator.userAgent;
+  const os = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows' : /Mac OS X/.test(ua) ? 'Mac' : /Linux/.test(ua) ? 'Linux' : 'Thiết bị';
+  const browser = /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera' : /Chrome|CriOS/.test(ua) ? 'Chrome' : /Firefox|FxiOS/.test(ua) ? 'Firefox' : /Safari/.test(ua) ? 'Safari' : 'Trình duyệt';
+  return `${browser} · ${os}`;
+};
+
+export type KickReason = 'other-device' | 'removed';
+
 export const signInGoogle = async () => {
+  store.set(CLAIM_KEY, '1'); // this device is about to sign in, so it takes the account over
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   try {
@@ -33,40 +73,91 @@ export const signInGoogle = async () => {
     if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
       await signInWithRedirect(auth, provider);
     } else if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') {
+      store.del(CLAIM_KEY);
       throw e;
+    } else {
+      store.del(CLAIM_KEY);
     }
   }
 };
 
-export const signOutUser = () => signOut(auth);
+export const signOutUser = () => {
+  store.del(SESSION_KEY);
+  store.del(CLAIM_KEY);
+  return signOut(auth);
+};
 
-/** Live view of the signed-in student's own record. A first-time Gmail is registered as "pending". */
-export const watchMyRecord = (user: AuthUser, cb: (s: Student | null) => void, onError: (e: Error) => void) => {
-  let asked = false;
+/**
+ * Live view of the signed-in student's own record. A first-time Gmail is registered as "pending".
+ * Also enforces one device per account: a fresh sign-in takes over, any other device is signed out via `onKicked`.
+ */
+export const watchMyRecord = (user: AuthUser, cb: (s: Student | null) => void, onError: (e: Error) => void, onKicked: (why: KickReason) => void) => {
+  let created = false;
+  let seen = false;
+  let claiming = false;
+  const kick = (why: KickReason) => {
+    store.del(SESSION_KEY);
+    store.del(CLAIM_KEY);
+    signOut(auth).finally(() => onKicked(why));
+  };
+  const claim = () => {
+    const session = { id: newId(), device: deviceLabel(), at: Date.now() };
+    store.set(SESSION_KEY, session.id);
+    store.del(CLAIM_KEY);
+    return session;
+  };
   return onSnapshot(
     ref(user.email),
     async (snap) => {
-      if (snap.exists()) {
-        cb(snap.data() as Student);
+      if (!snap.exists()) {
+        if (seen) {
+          kick('removed'); // the admin deleted this account while the child was signed in
+          return;
+        }
+        cb(null);
+        if (created) return;
+        created = true;
+        const now = Date.now();
+        try {
+          await setDoc(ref(user.email), {
+            email: user.email,
+            name: user.name,
+            photoURL: user.photoURL,
+            status: 'pending',
+            source: 'self',
+            createdAt: now,
+            updatedAt: now,
+            session: claim(),
+          } satisfies Student);
+        } catch (e) {
+          onError(e as Error);
+        }
         return;
       }
-      cb(null);
-      if (asked) return;
-      asked = true;
-      const now = Date.now();
-      try {
-        await setDoc(ref(user.email), {
-          email: user.email,
-          name: user.name,
-          photoURL: user.photoURL,
-          status: 'pending',
-          source: 'self',
-          createdAt: now,
-          updatedAt: now,
-        } satisfies Student);
-      } catch (e) {
-        onError(e as Error);
+      seen = true;
+      const data = snap.data() as Student;
+      const mine = store.get(SESSION_KEY);
+      if (store.get(CLAIM_KEY) || !mine) {
+        // fresh sign-in (or a session from before this rule existed): this device becomes the active one
+        if (claiming) return;
+        claiming = true;
+        const session = claim();
+        try {
+          await updateDoc(ref(user.email), { session, name: user.name || data.name, photoURL: user.photoURL || data.photoURL });
+          cb({ ...data, session });
+        } catch (e) {
+          onError(e as Error);
+        } finally {
+          claiming = false;
+        }
+        return;
       }
+      if (claiming) return;
+      if (data.session?.id !== mine) {
+        kick('other-device');
+        return;
+      }
+      cb(data);
     },
     (e) => onError(e)
   );
@@ -99,3 +190,6 @@ export const grantEmails = async (emails: string[]) => {
     }
   }
 };
+
+/** Admin: sign the student's current device out (they can sign in again right away). */
+export const kickDevice = (email: string) => updateDoc(ref(email), { session: deleteField() });

@@ -18,6 +18,8 @@ Hai cách cấp quyền, đều trong bảng **Quản lý học viên** (đăng 
 1. **Học viên tự đăng ký:** học viên bấm "Đăng nhập bằng Google" → hiện ở tab **Chờ duyệt** → admin bấm **Duyệt**.
 2. **Admin cấp Gmail trước:** tab **+ Cấp Gmail**, dán một hoặc nhiều Gmail → học viên đăng nhập đúng Gmail đó là vào học ngay.
 
+**Mỗi tài khoản chỉ học trên 1 thiết bị.** Khi học viên đăng nhập trên thiết bị thứ 2, thiết bị đầu tiên tự bị đăng xuất và hiện thông báo. Admin thấy thiết bị đang học (vd. "Safari · iPhone") trong tab **Đã duyệt** và có nút **Đá thiết bị** để buộc đăng xuất. Tài khoản admin không bị giới hạn thiết bị.
+
 Admin cũng có thể **Thu hồi** (về chờ duyệt), **Chặn**, **Bỏ chặn** và **Xoá** tài khoản.
 
 - *Xoá* chỉ xoá khỏi danh sách duyệt. Nếu người đó đăng nhập lại sẽ thành "chờ duyệt". Muốn cấm hẳn, dùng **Chặn**.
@@ -29,7 +31,7 @@ Admin cũng có thể **Thu hồi** (về chờ duyệt), **Chặn**, **Bỏ ch�
 2. **Build → Authentication → Get started → Sign-in method → Google → Enable**, chọn email hỗ trợ là Gmail của bạn → Save.
 3. **Authentication → Settings → Authorized domains → Add domain:** thêm tên miền web trên Vercel (ví dụ `xxx-rouge.vercel.app`). Có tên miền riêng thì thêm luôn.
 4. **Build → Firestore Database → Create database** (chọn chế độ *production*, vị trí gần Việt Nam như `asia-southeast1`).
-5. Firestore → tab **Rules** → dán toàn bộ nội dung file [`firestore.rules`](firestore.rules) → **Publish**.
+5. Firestore → tab **Rules** → dán toàn bộ nội dung file [`firestore.rules`](firestore.rules) → **Publish**. (Mỗi lần file này thay đổi, phải dán và Publish lại — bản mới nhất có thêm quyền cho phần giới hạn 1 thiết bị.)
 6. **Project settings (bánh răng) → Your apps → biểu tượng `</>` (Web)** → đặt tên, đăng ký. Firebase hiện đoạn `firebaseConfig`; lấy 4 giá trị: `apiKey`, `authDomain`, `projectId`, `appId`.
 7. Vào **Vercel → dự án → Settings → Environment Variables**, thêm 4 biến (áp dụng cho Production):
 

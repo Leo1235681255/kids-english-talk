@@ -80,6 +80,18 @@ export const App: React.FC = () => {
     },
   };
 
+  // a device that was signed out (or lost its approval) must not stay inside a locked lesson
+  useEffect(() => {
+    if (screen !== 'home' && !canOpenUnit(auth.status, lesson.unitCode)) go('home');
+  }, [auth.status, screen, lesson.unitCode, go]);
+
+  useEffect(() => {
+    if (auth.notice) {
+      go('home');
+      openAccount(auth.notice);
+    }
+  }, [auth.notice, go]);
+
   const next = nextLesson(lesson.id);
 
   return (

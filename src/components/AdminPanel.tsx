@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Ban, Check, RotateCcw, Trash2, UserPlus, X } from 'lucide-react';
+import { Ban, Check, LogOut, RotateCcw, Smartphone, Trash2, UserPlus, X } from 'lucide-react';
 import { AuthApi } from '../hooks/useAuth';
 import { Student, StudentStatus } from '../types';
 
@@ -14,6 +14,7 @@ type Accounts = Awaited<ReturnType<AuthApi['accounts']>>;
 
 const EMAIL_RE = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
 const fmt = (t: number) => new Date(t).toLocaleDateString('vi-VN');
+const fmtTime = (t: number) => new Date(t).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
 
 const Btn: React.FC<{ onClick: () => void; tone: 'green' | 'red' | 'gray'; children: React.ReactNode }> = ({ onClick, tone, children }) => (
   <button
@@ -59,6 +60,10 @@ export const AdminPanel: React.FC<Props> = ({ open, onClose, auth }) => {
   const setStatus = (s: Student, status: StudentStatus) => run((a) => a.setStatus(s.email, status));
   const block = (s: Student) => {
     if (window.confirm(`Chặn ${s.email}?\nHọ sẽ không vào học được nữa, kể cả bài học thử.`)) setStatus(s, 'blocked');
+  };
+  const kick = (s: Student) => {
+    if (window.confirm(`Đăng xuất thiết bị đang học của ${s.email}?
+Họ vẫn đăng nhập lại được ngay.`)) run((a) => a.kickDevice(s.email));
   };
   const remove = (s: Student) => {
     if (window.confirm(`Xoá ${s.email} khỏi danh sách?\nNếu họ đăng nhập lại sẽ trở thành "chờ duyệt". Muốn cấm hẳn hãy dùng Chặn.`)) {
@@ -168,6 +173,11 @@ export const AdminPanel: React.FC<Props> = ({ open, onClose, auth }) => {
                         <div className="text-[10px] font-bold text-slate-400">
                           {s.source === 'admin' ? 'Admin cấp' : 'Tự đăng ký'} · {fmt(s.createdAt)}
                         </div>
+                        {s.session && (
+                          <div className="mt-0.5 flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                            <Smartphone className="h-3 w-3" /> {s.session.device} · {fmtTime(s.session.at)}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1.5">
@@ -186,6 +196,11 @@ export const AdminPanel: React.FC<Props> = ({ open, onClose, auth }) => {
                           <Btn tone="gray" onClick={() => setStatus(s, 'pending')}>
                             <RotateCcw className="h-3.5 w-3.5" /> Thu hồi
                           </Btn>
+                          {s.session && (
+                            <Btn tone="gray" onClick={() => kick(s)}>
+                              <LogOut className="h-3.5 w-3.5" /> Đá thiết bị
+                            </Btn>
+                          )}
                           <Btn tone="red" onClick={() => block(s)}>
                             <Ban className="h-3.5 w-3.5" /> Chặn
                           </Btn>

@@ -16,6 +16,8 @@ export interface AuthApi {
   /** admin only: every student record, live */
   students: Student[];
   error: string;
+  /** set when this device was signed out (another device signed in, or the admin removed the account) */
+  notice: string;
   busy: boolean;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -36,6 +38,7 @@ export const useAuth = (): AuthApi => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const mod = useRef<Promise<Accounts> | null>(null);
 
@@ -65,7 +68,17 @@ export const useAuth = (): AuthApi => {
           setIsAdmin(admin);
           offData = admin
             ? a.watchStudents(setStudents, (e) => setError(friendly(e)))
-            : a.watchMyRecord(u, setRecord, (e) => setError(friendly(e)));
+            : a.watchMyRecord(
+                u,
+                setRecord,
+                (e) => setError(friendly(e)),
+                (why) =>
+                  setNotice(
+                    why === 'other-device'
+                      ? 'Tài khoản này vừa đăng nhập trên thiết bị khác nên thiết bị này đã được đăng xuất. Mỗi tài khoản chỉ học được trên 1 thiết bị.'
+                      : 'Tài khoản này đã bị xoá khỏi danh sách. Bé đăng nhập lại và chờ admin duyệt nhé.'
+                  )
+              );
         });
       })
       .catch(() => {
@@ -82,6 +95,7 @@ export const useAuth = (): AuthApi => {
   const signIn = useCallback(async () => {
     setBusy(true);
     setError('');
+    setNotice('');
     try {
       await (await accounts()).signInGoogle();
     } catch (e) {
@@ -103,5 +117,5 @@ export const useAuth = (): AuthApi => {
         ? 'guest'
         : record?.status ?? 'pending';
 
-  return { enabled: authEnabled, loading, user, status, isAdmin, students, error, busy, signIn, signOut, accounts };
+  return { enabled: authEnabled, loading, user, status, isAdmin, students, error, notice, busy, signIn, signOut, accounts };
 };

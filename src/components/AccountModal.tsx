@@ -61,7 +61,7 @@ export const AccountModal: React.FC<Props> = ({ open, onClose, auth, reason, onO
           <div className="mt-4 text-center">
             <img src="/art/pip_heart.png" alt="Pip" className="mx-auto w-24 a-bob" draggable={false} />
             <p className="mt-2 text-sm font-semibold text-slate-600">
-              Đăng nhập bằng Gmail của bé. Admin sẽ duyệt để mở toàn bộ bài học. Unit 1 luôn học thử được.
+              Đăng nhập bằng Gmail của bé. Admin sẽ duyệt để mở toàn bộ bài học. Unit 1 luôn học thử được. Mỗi tài khoản chỉ học được trên 1 thiết bị: đăng nhập máy mới thì máy cũ tự đăng xuất.
             </p>
             <button
               onClick={auth.signIn}

@@ -129,4 +129,6 @@ export interface Student {
   createdAt: number;
   updatedAt: number;
   approvedBy?: string;
+  /** the one device that is signed in right now; a newer sign-in replaces it and the older device is signed out */
+  session?: { id: string; device: string; at: number };
 }
