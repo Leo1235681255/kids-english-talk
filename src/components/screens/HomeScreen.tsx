@@ -7,6 +7,8 @@ import { Song } from '../../types';
 import { playPopSound } from '../../utils/audio';
 import { SongThumb } from '../ui/Song';
 import { InstallButton } from '../InstallButton';
+import { HonorBoard } from '../HonorBoard';
+import { ContactCard } from '../ContactCard';
 import { canOpenLesson } from '../../data/access';
 import { AuthApi } from '../../hooks/useAuth';
 
@@ -243,6 +245,9 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
               <p className="text-sm font-semibold text-slate-500">Pip đang chuẩn bị bài học mới cho các bé lớn hơn.</p>
             </div>
           )}
+
+          <HonorBoard auth={auth} stars={stars} />
+          <ContactCard />
 
           <p className="mt-5 text-center text-[11px] font-semibold text-slate-400">
             Kids English Talk · cùng Mi, Bin và Pip

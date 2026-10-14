@@ -10,3 +10,7 @@ export const firebaseConfig = {
 
 /** Accounts are only switched on once Firebase is configured; until then the app stays fully open. */
 export const authEnabled = Boolean(firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.projectId && firebaseConfig.appId);
+
+/** thầy LEO on Zalo: the "contact to own the apps" button at the bottom of the home screen. */
+export const ZALO_PHONE = '0799 713 094';
+export const ZALO_URL = 'https://zalo.me/0799713094';

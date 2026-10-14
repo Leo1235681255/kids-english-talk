@@ -1,9 +1,9 @@
 /** All Firebase code lives here and is loaded on demand, so the app stays light when accounts are off. */
 import { initializeApp } from 'firebase/app';
 import { GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut, User } from 'firebase/auth';
-import { collection, deleteDoc, deleteField, doc, getDoc, getFirestore, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, deleteDoc, deleteField, doc, getDoc, getFirestore, limit, onSnapshot, orderBy, query, setDoc, updateDoc } from 'firebase/firestore';
 import { ADMIN_EMAIL, firebaseConfig } from './config';
-import { Student, StudentStatus } from '../types';
+import { Honor, Student, StudentStatus } from '../types';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -12,12 +12,13 @@ const students = () => collection(db, 'students');
 const ref = (email: string) => doc(db, 'students', email.toLowerCase());
 
 export interface AuthUser {
+  uid: string;
   email: string;
   name: string;
   photoURL: string;
 }
 
-const toUser = (u: User): AuthUser => ({ email: (u.email ?? '').toLowerCase(), name: u.displayName ?? '', photoURL: u.photoURL ?? '' });
+const toUser = (u: User): AuthUser => ({ uid: u.uid, email: (u.email ?? '').toLowerCase(), name: u.displayName ?? '', photoURL: u.photoURL ?? '' });
 
 export const isAdminEmail = (email: string) => email.toLowerCase() === ADMIN_EMAIL;
 
@@ -193,3 +194,31 @@ export const grantEmails = async (emails: string[]) => {
 
 /** Admin: sign the student's current device out (they can sign in again right away). */
 export const kickDevice = (email: string) => updateDoc(ref(email), { session: deleteField() });
+
+/* ───────────── honor board ───────────── */
+
+const honors = () => collection(db, 'honors');
+
+/** "Nguyễn Văn An" -> "Bé An": the given name only, so no full names are shown in public. */
+export const shortName = (full: string) => {
+  const last = full.trim().split(/\s+/).pop() ?? '';
+  return last ? `Bé ${last}` : 'Bé yêu';
+};
+
+/** Top children by stars. Hidden ones are dropped here so the board never shows them. */
+export const watchHonors = (cb: (list: Honor[]) => void, onError: (e: Error) => void, includeHidden = false) =>
+  onSnapshot(
+    query(honors(), orderBy('stars', 'desc'), limit(includeHidden ? 100 : 40)),
+    (snap) => {
+      const all = snap.docs.map((d) => ({ ...(d.data() as Omit<Honor, 'uid'>), uid: d.id }));
+      cb(includeHidden ? all : all.filter((h) => !h.hidden));
+    },
+    (e) => onError(e)
+  );
+
+/** An approved child's own progress, shown on the board. */
+export const saveHonor = (user: AuthUser, stars: number, lessons: number) =>
+  setDoc(doc(db, 'honors', user.uid), { name: shortName(user.name), stars, lessons, updatedAt: Date.now() }, { merge: true });
+
+export const setHonorHidden = (uid: string, hidden: boolean) => setDoc(doc(db, 'honors', uid), { hidden }, { merge: true });
+export const removeHonor = (uid: string) => deleteDoc(doc(db, 'honors', uid));

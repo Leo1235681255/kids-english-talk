@@ -80,6 +80,20 @@ export const App: React.FC = () => {
     },
   };
 
+  // an approved child's stars and finished lessons go to the public honor board (a moment after they change)
+  const finished = Object.keys(progress.done).length;
+  useEffect(() => {
+    if (auth.status !== 'approved' || !auth.user || (progress.stars === 0 && finished === 0)) return;
+    const user = auth.user;
+    const t = window.setTimeout(() => {
+      auth
+        .accounts()
+        .then((a) => a.saveHonor(user, progress.stars, finished))
+        .catch(() => {});
+    }, 2500);
+    return () => window.clearTimeout(t);
+  }, [auth.status, auth.user?.uid, progress.stars, finished]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // a device that was signed out (or lost its approval) must not stay inside a locked lesson
   useEffect(() => {
     if (screen !== 'home' && !canOpenLesson(auth.status, lesson.id)) go('home');

@@ -132,3 +132,16 @@ export interface Student {
   /** the one device that is signed in right now; a newer sign-in replaces it and the older device is signed out */
   session?: { id: string; device: string; at: number };
 }
+
+/** One line of the public honor board (Firestore honors/<uid>). Holds only a short first name and progress, never an email. */
+export interface Honor {
+  uid: string;
+  /** short display name, e.g. "Bé An" */
+  name: string;
+  stars: number;
+  /** lessons finished */
+  lessons: number;
+  updatedAt: number;
+  /** set by the admin to take a child off the board */
+  hidden?: boolean;
+}

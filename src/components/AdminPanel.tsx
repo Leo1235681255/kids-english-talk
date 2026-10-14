@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
-import { Ban, Check, LogOut, RotateCcw, Smartphone, Trash2, UserPlus, X } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Ban, Check, Eye, EyeOff, LogOut, RotateCcw, Smartphone, Trash2, UserPlus, X } from 'lucide-react';
 import { AuthApi } from '../hooks/useAuth';
-import { Student, StudentStatus } from '../types';
+import { Honor, Student, StudentStatus } from '../types';
 
 interface Props {
   open: boolean;
@@ -9,7 +9,7 @@ interface Props {
   auth: AuthApi;
 }
 
-type Tab = StudentStatus | 'add';
+type Tab = StudentStatus | 'add' | 'honors';
 type Accounts = Awaited<ReturnType<AuthApi['accounts']>>;
 
 const EMAIL_RE = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
@@ -33,6 +33,23 @@ export const AdminPanel: React.FC<Props> = ({ open, onClose, auth }) => {
   const [text, setText] = useState('');
   const [note, setNote] = useState('');
   const [working, setWorking] = useState(false);
+  const [honors, setHonors] = useState<Honor[]>([]);
+
+  useEffect(() => {
+    if (!open) return;
+    let off = () => {};
+    let dead = false;
+    auth
+      .accounts()
+      .then((a) => {
+        if (!dead) off = a.watchHonors(setHonors, () => {}, true);
+      })
+      .catch(() => {});
+    return () => {
+      dead = true;
+      off();
+    };
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const counts = useMemo(() => {
     const c = { pending: 0, approved: 0, blocked: 0 };
@@ -42,7 +59,7 @@ export const AdminPanel: React.FC<Props> = ({ open, onClose, auth }) => {
 
   if (!open) return null;
 
-  const list = tab === 'add' ? [] : auth.students.filter((s) => s.status === tab && `${s.email} ${s.name}`.toLowerCase().includes(q.trim().toLowerCase()));
+  const list = tab === 'add' || tab === 'honors' ? [] : auth.students.filter((s) => s.status === tab && `${s.email} ${s.name}`.toLowerCase().includes(q.trim().toLowerCase()));
 
   const run = async (fn: (a: Accounts) => Promise<unknown>) => {
     setWorking(true);
@@ -92,6 +109,7 @@ Họ vẫn đăng nhập lại được ngay.`)) run((a) => a.kickDevice(s.email
     { id: 'pending', label: `Chờ duyệt (${counts.pending})` },
     { id: 'approved', label: `Đã duyệt (${counts.approved})` },
     { id: 'blocked', label: `Đã chặn (${counts.blocked})` },
+    { id: 'honors', label: `🏆 Vinh danh (${honors.length})` },
     { id: 'add', label: '+ Cấp Gmail' },
   ];
 
@@ -132,7 +150,36 @@ Họ vẫn đăng nhập lại được ngay.`)) run((a) => a.kickDevice(s.email
           {auth.error && <p className="mb-2 rounded-xl bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600">{auth.error}</p>}
           {note && <p className="mb-2 rounded-xl bg-sky-50 px-3 py-2 text-xs font-bold text-sky-700">{note}</p>}
 
-          {tab === 'add' ? (
+          {tab === 'honors' ? (
+            <div className="space-y-2">
+              <p className="rounded-xl bg-white px-3 py-2 text-xs font-semibold text-slate-500">
+                Bảng vinh danh hiện công khai trên trang chủ (tên rút gọn, không email). Bấm <b>Ẩn</b> để gỡ một bé khỏi bảng.
+              </p>
+              {honors.length === 0 && <p className="py-10 text-center text-sm font-bold text-slate-400">Chưa có bé nào trên bảng.</p>}
+              {honors.map((h, i) => (
+                <div key={h.uid} className={`flex items-center gap-2.5 rounded-2xl bg-white p-3 shadow-sm ${h.hidden ? 'opacity-60' : ''}`}>
+                  <span className="w-6 text-center text-sm font-black text-slate-400">{i + 1}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-black text-[#0f3a8a]">{h.name}</div>
+                    <div className="text-[11px] font-bold text-slate-500">
+                      ⭐ {h.stars} · {h.lessons} bài{h.hidden ? ' · đang ẩn' : ''}
+                    </div>
+                  </div>
+                  <Btn tone="gray" onClick={() => run((a) => a.setHonorHidden(h.uid, !h.hidden))}>
+                    {h.hidden ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />} {h.hidden ? 'Hiện' : 'Ẩn'}
+                  </Btn>
+                  <Btn
+                    tone="red"
+                    onClick={() => {
+                      if (window.confirm(`Xoá ${h.name} khỏi bảng vinh danh? Bé học tiếp thì sẽ tự có lại.`)) run((a) => a.removeHonor(h.uid));
+                    }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Btn>
+                </div>
+              ))}
+            </div>
+          ) : tab === 'add' ? (
             <div className="rounded-2xl bg-white p-3 shadow-sm">
               <p className="text-sm font-black text-[#0f3a8a]">Cấp quyền bằng Gmail</p>
               <p className="mt-0.5 text-xs font-semibold text-slate-500">
