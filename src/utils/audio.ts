@@ -133,6 +133,9 @@ export const stopSpeaking = () => {
   }
 };
 
+/** Spelling tweaks for words the voice reads wrongly. "live" (sống) is read like the adjective /laɪv/ on its own, so say "liv". */
+const sayAs = (text: string) => text.replace(/\blive\b/gi, (m) => (m[0] === 'L' ? 'Liv' : 'liv'));
+
 export const speakText = (
   text: string,
   options: {
@@ -150,7 +153,7 @@ export const speakText = (
 
   stopSpeaking();
 
-  const utterance = new SpeechSynthesisUtterance(text);
+  const utterance = new SpeechSynthesisUtterance(sayAs(text));
   utterance.lang = 'en-US';
 
   // Customize pitch & rate for cheerful kid characters
