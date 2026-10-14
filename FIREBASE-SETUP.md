@@ -8,8 +8,8 @@ Admin: `nguyentoandinh.0511@gmail.com`
 
 | Trạng thái | Quyền học |
 |---|---|
-| Chưa đăng nhập / chờ duyệt | Chỉ học thử **Unit 1 (L1-U01)** |
-| Đã duyệt | Toàn bộ 128 bài |
+| Chưa đăng nhập / chờ duyệt | Chỉ học thử **bài đầu tiên (L1-U01-B1)** |
+| Đã duyệt | Toàn bộ 192 bài |
 | Bị chặn | Không vào học được bài nào |
 | Admin | Toàn bộ + bảng quản lý học viên |
 

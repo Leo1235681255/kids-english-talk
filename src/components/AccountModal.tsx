@@ -28,7 +28,7 @@ const BADGE: Record<string, { text: string; cls: string }> = {
 };
 
 const MESSAGE: Record<string, string> = {
-  pending: 'Gmail của bé đã được gửi cho admin. Khi được duyệt, tất cả bài học sẽ mở. Trong lúc chờ, bé học thử Unit 1 nhé!',
+  pending: 'Gmail của bé đã được gửi cho admin. Khi được duyệt, tất cả bài học sẽ mở. Trong lúc chờ, bé học thử bài đầu tiên (Unit 1 · B1) nhé!',
   approved: 'Tất cả bài học đã mở cho bé. Chúc bé học vui!',
   blocked: 'Tài khoản này đang bị khoá. Phụ huynh vui lòng liên hệ admin để được hỗ trợ.',
   admin: 'Bạn có thể duyệt, cấp, chặn hoặc xoá tài khoản học viên.',
@@ -61,7 +61,7 @@ export const AccountModal: React.FC<Props> = ({ open, onClose, auth, reason, onO
           <div className="mt-4 text-center">
             <img src="/art/pip_heart.png" alt="Pip" className="mx-auto w-24 a-bob" draggable={false} />
             <p className="mt-2 text-sm font-semibold text-slate-600">
-              Đăng nhập bằng Gmail của bé. Admin sẽ duyệt để mở toàn bộ bài học. Unit 1 luôn học thử được. Mỗi tài khoản chỉ học được trên 1 thiết bị: đăng nhập máy mới thì máy cũ tự đăng xuất.
+              Đăng nhập bằng Gmail của bé. Admin sẽ duyệt để mở toàn bộ bài học. Bài đầu tiên (Unit 1 · B1) luôn học thử được. Mỗi tài khoản chỉ học được trên 1 thiết bị: đăng nhập máy mới thì máy cũ tự đăng xuất.
             </p>
             <button
               onClick={auth.signIn}

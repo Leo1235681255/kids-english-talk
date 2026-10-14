@@ -17,7 +17,7 @@ import { StickerBookModal } from './components/StickerBookModal';
 import { MusicModal } from './components/MusicModal';
 import { AccountModal } from './components/AccountModal';
 import { AdminPanel } from './components/AdminPanel';
-import { canOpenUnit } from './data/access';
+import { canOpenLesson } from './data/access';
 import { useAuth } from './hooks/useAuth';
 import { useProgress } from './hooks/useProgress';
 import { stopSpeaking } from './utils/audio';
@@ -47,14 +47,14 @@ export const App: React.FC = () => {
 
   const start = (id: string) => {
     const target = getLesson(id);
-    if (target && !canOpenUnit(auth.status, target.unitCode)) {
+    if (target && !canOpenLesson(auth.status, target.id)) {
       go('home');
       openAccount(
         auth.status === 'blocked'
           ? 'Tài khoản này đang bị khoá, chưa học được bài này.'
           : auth.status === 'pending'
-            ? 'Bài này mở sau khi admin duyệt tài khoản của bé. Bé học thử Unit 1 trước nhé!'
-            : 'Bé đăng nhập bằng Gmail và chờ admin duyệt để học bài này nhé. Unit 1 học thử miễn phí!'
+            ? 'Bài này mở sau khi admin duyệt tài khoản của bé. Bé học thử bài đầu tiên trước nhé!'
+            : 'Bé đăng nhập bằng Gmail và chờ admin duyệt để học bài này nhé. Bài đầu tiên học thử miễn phí!'
       );
       return;
     }
@@ -82,8 +82,8 @@ export const App: React.FC = () => {
 
   // a device that was signed out (or lost its approval) must not stay inside a locked lesson
   useEffect(() => {
-    if (screen !== 'home' && !canOpenUnit(auth.status, lesson.unitCode)) go('home');
-  }, [auth.status, screen, lesson.unitCode, go]);
+    if (screen !== 'home' && !canOpenLesson(auth.status, lesson.id)) go('home');
+  }, [auth.status, screen, lesson.id, go]);
 
   useEffect(() => {
     if (auth.notice) {

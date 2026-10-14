@@ -7,7 +7,7 @@ import { Song } from '../../types';
 import { playPopSound } from '../../utils/audio';
 import { SongThumb } from '../ui/Song';
 import { InstallButton } from '../InstallButton';
-import { canOpenUnit } from '../../data/access';
+import { canOpenLesson } from '../../data/access';
 import { AuthApi } from '../../hooks/useAuth';
 
 interface Props {
@@ -214,7 +214,7 @@ export const HomeScreen: React.FC<Props> = ({ stars, collected, done, onStart, o
                       );
                     }
                     const isDone = l.id in done;
-                    const locked = !canOpenUnit(auth.status, u.code);
+                    const locked = !canOpenLesson(auth.status, l.id);
                     return (
                       <button
                         key={no}
